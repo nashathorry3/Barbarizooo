@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: barbarizoo-backend
+  # Default profile runs on in-memory H2 so the API is runnable with zero setup.
+  datasource:
+    url: jdbc:h2:mem:barbarizoo;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8080
+
+barbarizoo:
+  # Fallback tenant used when no X-Tenant-Id header is supplied (matches seed data).
+  default-tenant-id: "11111111-1111-1111-1111-111111111111"
+  cors:
+    allowed-origins: "http://localhost:3000"
+
+logging:
+  level:
+    com.barbarizoo: INFO

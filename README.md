@@ -8,9 +8,51 @@ The goal: a product that is **stronger than Fresha, Treatwell, Shore, and Planit
 
 ---
 
-## 📦 What's in this repository
+## 🧱 Repository structure
 
-This repository holds the **full product blueprint** — the architecture, scope, design, and roadmap needed to build Barbarizoo. Each document maps to a deliverable.
+```
+.
+├── backend/      Spring Boot (Java 21) REST API — booking core + dynamic pricing
+├── frontend/     Next.js (TypeScript, Tailwind) — customer booking + owner dashboard
+└── docs/         Full product blueprint (10 deliverables, see below)
+```
+
+## 🚀 Running the application
+
+**Backend** (Java 21 + Maven) — runs on in-memory H2 with seed data, zero setup:
+
+```bash
+cd backend
+mvn spring-boot:run          # → http://localhost:8080
+# Postgres instead of H2:
+# mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+```
+
+**Frontend** (Node 20+):
+
+```bash
+cd frontend
+cp .env.local.example .env.local
+npm install
+npm run dev                   # → http://localhost:3000
+```
+
+Open `http://localhost:3000` to book an appointment and `http://localhost:3000/dashboard`
+to manage bookings. The seed salon ("Barbarizoo Demo Barbershop Berlin") comes with
+services and two stylists. Prices shift with demand via the rules-based Dynamic Pricing engine.
+
+### Implemented in this MVP slice
+- Service catalog & staff (`GET /api/v1/services`, `/staff`)
+- Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
+- Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement
+- Multi-tenancy via `X-Tenant-Id`, Flyway migrations, GDPR consent capture, validation & error envelope
+
+> The four AI engines and remaining modules are specified in `docs/` and stubbed for
+> follow-up implementation; this slice delivers the runnable booking + pricing core.
+
+## 📦 Product blueprint
+
+This repository also holds the **full product blueprint** — the architecture, scope, design, and roadmap needed to build Barbarizoo. Each document maps to a deliverable.
 
 | # | Document | Description |
 |---|----------|-------------|

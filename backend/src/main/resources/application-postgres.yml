@@ -1,0 +1,17 @@
+# Activate with: --spring.profiles.active=postgres
+# Provides a production-like PostgreSQL connection (EU region in real deployments).
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/barbarizoo}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:barbarizoo}
+    password: ${DB_PASSWORD:barbarizoo}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  h2:
+    console:
+      enabled: false
