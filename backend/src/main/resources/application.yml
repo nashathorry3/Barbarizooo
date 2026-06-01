@@ -34,6 +34,11 @@ barbarizoo:
     # Override in production via BARBARIZOO_JWT_SECRET. Must be >= 32 chars (HS256).
     secret: ${BARBARIZOO_JWT_SECRET:dev-only-secret-change-me-please-32bytes-minimum!!}
     expiration-minutes: 720
+  payments:
+    # Deposit charged at booking to reduce no-shows (% of the slot price).
+    deposit-percent: 30
+    # "simulated" (default, no external account) or "stripe" (real, future).
+    provider: simulated
 
 logging:
   level:

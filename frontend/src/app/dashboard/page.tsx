@@ -8,8 +8,9 @@ import {
   euro,
   type Booking,
   type BookingStatus,
+  type Payment,
 } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { getToken, getUser } from "@/lib/auth";
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
   PENDING: "bg-amber-100 text-amber-700",
@@ -28,8 +29,11 @@ const NEXT_ACTIONS: { label: string; status: BookingStatus }[] = [
 export default function DashboardPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const role = getUser()?.role;
+  const canSeePayments = role === "OWNER" || role === "MANAGER";
 
   function load() {
     setLoading(true);
@@ -38,6 +42,10 @@ export default function DashboardPage() {
       .then(setBookings)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+    // Payment listing is restricted to owners/managers.
+    if (canSeePayments) {
+      api.payments().then(setPayments).catch(() => {});
+    }
   }
 
   // Redirect to login if there is no session; otherwise load bookings.
@@ -66,8 +74,13 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Owner dashboard</h1>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-slate-500">
+            {role && (
+              <span className="mr-2 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600">
+                {role}
+              </span>
+            )}
             {bookings.length} bookings · projected revenue{" "}
             <span className="font-semibold text-slate-800">{euro(revenue)}</span>
           </p>
@@ -148,6 +161,58 @@ export default function DashboardPage() {
           </tbody>
         </table>
       </div>
+
+      {canSeePayments && (
+        <section>
+          <h2 className="mb-2 text-lg font-semibold">Deposits &amp; payments</h2>
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-slate-500">
+                <tr>
+                  <th className="px-4 py-3 font-medium">When</th>
+                  <th className="px-4 py-3 font-medium">Type</th>
+                  <th className="px-4 py-3 font-medium">Amount</th>
+                  <th className="px-4 py-3 font-medium">Provider</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                      No payments yet.
+                    </td>
+                  </tr>
+                ) : (
+                  payments.map((p) => (
+                    <tr key={p.id} className="border-t border-slate-100">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {dateTimeLabel(p.createdAt)}
+                      </td>
+                      <td className="px-4 py-3">{p.type}</td>
+                      <td className="px-4 py-3 font-medium">{euro(p.amountCents)}</td>
+                      <td className="px-4 py-3 text-slate-500">{p.provider}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${
+                            p.status === "SUCCEEDED"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : p.status === "FAILED"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          {p.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -2,8 +2,10 @@ package com.barbarizoo.api.dto;
 
 import com.barbarizoo.domain.BookingStatus;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,6 +21,15 @@ public final class Dtos {
     public record ServiceDto(
             UUID id, String name, String category, int durationMin,
             int basePriceCents, int vatRate, List<UUID> staffIds) {
+    }
+
+    public record CreateServiceRequest(
+            @NotBlank String name,
+            @NotBlank String category,
+            @Positive int durationMin,
+            @Min(0) int basePriceCents,
+            Integer vatRate,
+            List<UUID> staffIds) {
     }
 
     public record StaffDto(

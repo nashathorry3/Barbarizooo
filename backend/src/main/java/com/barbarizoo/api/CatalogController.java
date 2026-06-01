@@ -1,13 +1,23 @@
 package com.barbarizoo.api;
 
+import com.barbarizoo.api.dto.Dtos.CreateServiceRequest;
 import com.barbarizoo.api.dto.Dtos.ServiceDto;
 import com.barbarizoo.api.dto.Dtos.StaffDto;
 import com.barbarizoo.service.CatalogService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -27,5 +37,21 @@ public class CatalogController {
     @GetMapping("/staff")
     public List<StaffDto> staff() {
         return catalog.listStaff();
+    }
+
+    /** Create a service — owners and managers only. */
+    @PostMapping("/services")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
+    public ServiceDto createService(@Valid @RequestBody CreateServiceRequest request) {
+        return catalog.createService(request);
+    }
+
+    /** Deactivate a service — owners and managers only. */
+    @DeleteMapping("/services/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
+    public void deactivateService(@PathVariable UUID id) {
+        catalog.deactivateService(id);
     }
 }

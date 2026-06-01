@@ -13,6 +13,7 @@ public class AppProperties {
     private UUID defaultTenantId;
     private Cors cors = new Cors();
     private Jwt jwt = new Jwt();
+    private Payments payments = new Payments();
 
     public UUID getDefaultTenantId() {
         return defaultTenantId;
@@ -36,6 +37,14 @@ public class AppProperties {
 
     public void setJwt(Jwt jwt) {
         this.jwt = jwt;
+    }
+
+    public Payments getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Payments payments) {
+        this.payments = payments;
     }
 
     public static class Cors {
@@ -68,6 +77,27 @@ public class AppProperties {
 
         public void setExpirationMinutes(long expirationMinutes) {
             this.expirationMinutes = expirationMinutes;
+        }
+    }
+
+    public static class Payments {
+        private int depositPercent = 30;
+        private String provider = "simulated";
+
+        public int getDepositPercent() {
+            return depositPercent;
+        }
+
+        public void setDepositPercent(int depositPercent) {
+            this.depositPercent = depositPercent;
+        }
+
+        public String getProvider() {
+            return provider;
+        }
+
+        public void setProvider(String provider) {
+            this.provider = provider;
         }
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -40,11 +42,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/login", "/h2-console/**").permitAll()
-                        // Public customer-facing booking flow:
+                        // Public customer-facing booking + deposit flow:
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/services", "/api/v1/staff", "/api/v1/availability").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings").permitAll()
-                        // Everything else (dashboard, status changes, /me) requires login:
+                        .requestMatchers("/api/v1/payments/deposit/**").permitAll()
+                        // Everything else requires login; fine-grained roles via @PreAuthorize:
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -45,6 +45,12 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
 - **Authentication** — JWT login (`POST /api/v1/auth/login`, `GET /api/v1/auth/me`); the
   dashboard requires sign-in while the customer booking flow stays public. Demo account:
   `owner@demo.barbarizoo` / `password123`.
+- **Role-based access control (RBAC)** — `OWNER` / `MANAGER` / `STAFF`. Managing the service
+  catalog (`POST`/`DELETE /api/v1/services`) is owner/manager-only; user management
+  (`GET`/`POST /api/v1/users`) is owner-only for create. Enforced via `@PreAuthorize`.
+- **Payments (deposits)** — provider-agnostic gateway with a simulated implementation
+  (swappable for Stripe). Customer takes a deposit (`POST /api/v1/payments/deposit` +
+  `/confirm`); owners/managers see payments (`GET /api/v1/payments`). Deposit % is configurable.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
 - Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement

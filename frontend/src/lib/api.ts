@@ -83,6 +83,33 @@ export interface CreateBookingInput {
   marketingConsent?: boolean;
 }
 
+export type PaymentStatus =
+  | "REQUIRES_PAYMENT"
+  | "SUCCEEDED"
+  | "FAILED"
+  | "REFUNDED";
+
+export interface DepositIntent {
+  paymentId: string;
+  providerRef: string;
+  clientSecret: string;
+  amountCents: number;
+  currency: string;
+  status: PaymentStatus;
+}
+
+export interface Payment {
+  id: string;
+  bookingId: string;
+  provider: string;
+  type: string;
+  amountCents: number;
+  currency: string;
+  status: PaymentStatus;
+  providerRef: string;
+  createdAt: string;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
   const res = await fetch(`${API_BASE}${path}`, {
@@ -135,6 +162,16 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify({ status }),
     }),
+  createDeposit: (bookingId: string) =>
+    request<DepositIntent>("/api/v1/payments/deposit", {
+      method: "POST",
+      body: JSON.stringify({ bookingId }),
+    }),
+  confirmDeposit: (providerRef: string) =>
+    request<Payment>(`/api/v1/payments/deposit/${providerRef}/confirm`, {
+      method: "POST",
+    }),
+  payments: () => request<Payment[]>("/api/v1/payments"),
 };
 
 export function euro(cents: number): string {

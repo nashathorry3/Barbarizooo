@@ -29,9 +29,21 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 | GET  | `/api/v1/services` | public | List active services |
 | GET  | `/api/v1/staff` | public | List active staff |
 | GET  | `/api/v1/availability?serviceId&staffId&date` | public | Free slots + dynamic price |
+| POST | `/api/v1/services` | **OWNER/MANAGER** | Create a service |
+| DELETE | `/api/v1/services/{id}` | **OWNER/MANAGER** | Deactivate a service |
+| GET  | `/api/v1/users` | **OWNER/MANAGER** | List staff accounts |
+| POST | `/api/v1/users` | **OWNER** | Create a staff account |
 | POST | `/api/v1/bookings` | public | Create a booking (customer flow) |
 | GET  | `/api/v1/bookings` | **bearer** | List bookings (dashboard) |
 | PATCH| `/api/v1/bookings/{id}/status` | **bearer** | Update booking status |
+| POST | `/api/v1/payments/deposit` | public | Start a deposit for a booking |
+| POST | `/api/v1/payments/deposit/{ref}/confirm` | public | Confirm the deposit (PSP webhook in prod) |
+| GET  | `/api/v1/payments` | **OWNER/MANAGER** | List payments |
+
+**Roles:** `OWNER` > `MANAGER` > `STAFF`, carried in the JWT and enforced with
+`@PreAuthorize`. **Payments:** a `simulated` gateway is the default
+(`barbarizoo.payments.provider`); deposit size is `barbarizoo.payments.deposit-percent`
+(default 30%). A Stripe gateway can be dropped in behind the `PaymentGateway` interface.
 
 **Tenancy:** authenticated requests derive the tenant from the JWT. Public
 requests use the `X-Tenant-Id` header, falling back to the seed demo salon
@@ -65,19 +77,20 @@ curl -X POST http://localhost:8080/api/v1/bookings \
 
 ```
 api/         REST controllers + DTOs (catalog, availability, booking)
-auth/        Login/me controller + service + DTOs
-security/    JWT issue/verify, auth filter, Spring Security config
+auth/        Login/me + user management controllers, services, DTOs
+security/    JWT issue/verify, auth filter, Spring Security config (RBAC)
+payments/    Provider-agnostic gateway + simulated impl, service, controller
 service/     Application services (catalog, availability, booking)
 pricing/     Dynamic Pricing engine (rules-based "lite")
-domain/      JPA entities (incl. AppUser)
+domain/      JPA entities (incl. AppUser, Payment)
 repo/        Spring Data repositories
 tenant/      Multi-tenant request context
 common/      Error handling
 config/      Properties + demo data seeder
-resources/db/migration  Flyway schema + seed (V1 core, V2 auth)
+resources/db/migration  Flyway schema (V1 core, V2 auth, V3 payments)
 ```
 
 ## Next steps (per `docs/`)
-- Role-based authorization rules, refresh tokens, add RLS on PostgreSQL.
-- Payments (Stripe), reminders (WhatsApp/Email), waitlist automation.
+- Real Stripe gateway behind `PaymentGateway`; refresh tokens; RLS on PostgreSQL.
+- Reminders (WhatsApp/Email), waitlist automation.
 - AI engines: Hairstyle Preview, ML Dynamic Pricing, Inventory Prediction, Receptionist.
