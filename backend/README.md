@@ -22,17 +22,30 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 
 ## API
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| GET  | `/api/v1/services` | List active services |
-| GET  | `/api/v1/staff` | List active staff |
-| GET  | `/api/v1/availability?serviceId&staffId&date` | Free slots + dynamic price |
-| GET  | `/api/v1/bookings` | List bookings |
-| POST | `/api/v1/bookings` | Create a booking |
-| PATCH| `/api/v1/bookings/{id}/status` | Update booking status |
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| POST | `/api/v1/auth/login` | public | Sign in, returns JWT |
+| GET  | `/api/v1/auth/me` | **bearer** | Current user |
+| GET  | `/api/v1/services` | public | List active services |
+| GET  | `/api/v1/staff` | public | List active staff |
+| GET  | `/api/v1/availability?serviceId&staffId&date` | public | Free slots + dynamic price |
+| POST | `/api/v1/bookings` | public | Create a booking (customer flow) |
+| GET  | `/api/v1/bookings` | **bearer** | List bookings (dashboard) |
+| PATCH| `/api/v1/bookings/{id}/status` | **bearer** | Update booking status |
 
-All requests are tenant-scoped via the `X-Tenant-Id` header (falls back to the
-seed demo salon `11111111-1111-1111-1111-111111111111`).
+**Tenancy:** authenticated requests derive the tenant from the JWT. Public
+requests use the `X-Tenant-Id` header, falling back to the seed demo salon
+`11111111-1111-1111-1111-111111111111`.
+
+**Demo login:** `owner@demo.barbarizoo` / `password123` (seeded on first start).
+
+```bash
+TOKEN=$(curl -s -X POST localhost:8080/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"owner@demo.barbarizoo","password":"password123"}' \
+  | sed -E 's/.*"token":"([^"]+)".*/\1/')
+curl -s localhost:8080/api/v1/bookings -H "Authorization: Bearer $TOKEN"
+```
 
 ### Example
 
@@ -51,18 +64,20 @@ curl -X POST http://localhost:8080/api/v1/bookings \
 ## Layout
 
 ```
-api/         REST controllers + DTOs
+api/         REST controllers + DTOs (catalog, availability, booking)
+auth/        Login/me controller + service + DTOs
+security/    JWT issue/verify, auth filter, Spring Security config
 service/     Application services (catalog, availability, booking)
 pricing/     Dynamic Pricing engine (rules-based "lite")
-domain/      JPA entities
+domain/      JPA entities (incl. AppUser)
 repo/        Spring Data repositories
-tenant/      Multi-tenant request context + filter
+tenant/      Multi-tenant request context
 common/      Error handling
-config/      CORS, properties
-resources/db/migration  Flyway schema + seed
+config/      Properties + demo data seeder
+resources/db/migration  Flyway schema + seed (V1 core, V2 auth)
 ```
 
 ## Next steps (per `docs/`)
-- AuthN/AuthZ (OIDC/JWT) → derive tenant from token, add RLS on PostgreSQL.
+- Role-based authorization rules, refresh tokens, add RLS on PostgreSQL.
 - Payments (Stripe), reminders (WhatsApp/Email), waitlist automation.
 - AI engines: Hairstyle Preview, ML Dynamic Pricing, Inventory Prediction, Receptionist.

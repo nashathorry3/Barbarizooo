@@ -26,10 +26,14 @@ server:
   port: 8080
 
 barbarizoo:
-  # Fallback tenant used when no X-Tenant-Id header is supplied (matches seed data).
+  # Fallback tenant used for public requests with no X-Tenant-Id header (matches seed data).
   default-tenant-id: "11111111-1111-1111-1111-111111111111"
   cors:
     allowed-origins: "http://localhost:3000"
+  jwt:
+    # Override in production via BARBARIZOO_JWT_SECRET. Must be >= 32 chars (HS256).
+    secret: ${BARBARIZOO_JWT_SECRET:dev-only-secret-change-me-please-32bytes-minimum!!}
+    expiration-minutes: 720
 
 logging:
   level:

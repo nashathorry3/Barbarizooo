@@ -12,6 +12,7 @@ public class AppProperties {
 
     private UUID defaultTenantId;
     private Cors cors = new Cors();
+    private Jwt jwt = new Jwt();
 
     public UUID getDefaultTenantId() {
         return defaultTenantId;
@@ -29,6 +30,14 @@ public class AppProperties {
         this.cors = cors;
     }
 
+    public Jwt getJwt() {
+        return jwt;
+    }
+
+    public void setJwt(Jwt jwt) {
+        this.jwt = jwt;
+    }
+
     public static class Cors {
         private String allowedOrigins = "http://localhost:3000";
 
@@ -38,6 +47,27 @@ public class AppProperties {
 
         public void setAllowedOrigins(String allowedOrigins) {
             this.allowedOrigins = allowedOrigins;
+        }
+    }
+
+    public static class Jwt {
+        private String secret;
+        private long expirationMinutes = 720;
+
+        public String getSecret() {
+            return secret;
+        }
+
+        public void setSecret(String secret) {
+            this.secret = secret;
+        }
+
+        public long getExpirationMinutes() {
+            return expirationMinutes;
+        }
+
+        public void setExpirationMinutes(long expirationMinutes) {
+            this.expirationMinutes = expirationMinutes;
         }
     }
 }

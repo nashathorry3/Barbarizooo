@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   api,
@@ -8,6 +9,7 @@ import {
   type Booking,
   type BookingStatus,
 } from "@/lib/api";
+import { getToken } from "@/lib/auth";
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
   PENDING: "bg-amber-100 text-amber-700",
@@ -24,6 +26,7 @@ const NEXT_ACTIONS: { label: string; status: BookingStatus }[] = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +40,14 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(load, []);
+  // Redirect to login if there is no session; otherwise load bookings.
+  useEffect(() => {
+    if (!getToken()) {
+      router.replace("/login");
+      return;
+    }
+    load();
+  }, [router]);
 
   async function setStatus(id: string, status: BookingStatus) {
     try {

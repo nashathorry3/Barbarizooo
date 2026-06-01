@@ -42,10 +42,14 @@ to manage bookings. The seed salon ("Barbarizoo Demo Barbershop Berlin") comes w
 services and two stylists. Prices shift with demand via the rules-based Dynamic Pricing engine.
 
 ### Implemented in this MVP slice
+- **Authentication** — JWT login (`POST /api/v1/auth/login`, `GET /api/v1/auth/me`); the
+  dashboard requires sign-in while the customer booking flow stays public. Demo account:
+  `owner@demo.barbarizoo` / `password123`.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
 - Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement
-- Multi-tenancy via `X-Tenant-Id`, Flyway migrations, GDPR consent capture, validation & error envelope
+- Multi-tenancy: tenant derived from the JWT for authenticated requests, `X-Tenant-Id` for the
+  public flow; Flyway migrations, BCrypt password hashing, GDPR consent capture, validation & error envelope
 
 > The four AI engines and remaining modules are specified in `docs/` and stubbed for
 > follow-up implementation; this slice delivers the runnable booking + pricing core.

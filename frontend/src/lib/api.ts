@@ -1,8 +1,24 @@
 // Typed client for the Barbarizoo backend API.
 
+import { getToken } from "./auth";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080";
 const TENANT_ID =
   process.env.NEXT_PUBLIC_TENANT_ID ?? "11111111-1111-1111-1111-111111111111";
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  displayName: string;
+  role: string;
+  tenantId: string;
+}
+
+export interface TokenResponse {
+  token: string;
+  expiresAt: string;
+  user: AuthUser;
+}
 
 export interface Service {
   id: string;
@@ -68,11 +84,15 @@ export interface CreateBookingInput {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getToken();
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      // Public booking flow identifies the salon via header; authenticated
+      // requests derive the tenant from the token instead.
       "X-Tenant-Id": TENANT_ID,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
     cache: "no-store",
@@ -92,6 +112,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  login: (email: string, password: string) =>
+    request<TokenResponse>("/api/v1/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  me: () => request<AuthUser>("/api/v1/auth/me"),
   services: () => request<Service[]>("/api/v1/services"),
   staff: () => request<Staff[]>("/api/v1/staff"),
   availability: (serviceId: string, staffId: string, date: string) =>
