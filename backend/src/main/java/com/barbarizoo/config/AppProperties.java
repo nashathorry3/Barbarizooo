@@ -82,6 +82,7 @@ public class AppProperties {
 
     public static class Payments {
         private int depositPercent = 30;
+        private boolean requireDeposit = true;
         private String provider = "simulated";
 
         public int getDepositPercent() {
@@ -90,6 +91,14 @@ public class AppProperties {
 
         public void setDepositPercent(int depositPercent) {
             this.depositPercent = depositPercent;
+        }
+
+        public boolean isRequireDeposit() {
+            return requireDeposit;
+        }
+
+        public void setRequireDeposit(boolean requireDeposit) {
+            this.requireDeposit = requireDeposit;
         }
 
         public String getProvider() {

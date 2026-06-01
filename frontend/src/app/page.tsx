@@ -41,12 +41,19 @@ export default function BookingPage() {
   const [paying, setPaying] = useState(false);
   const [paid, setPaid] = useState(false);
 
-  // Load catalog once.
+  // Load catalog once; honor a ?category= deep link from the AI Preview studio.
   useEffect(() => {
     Promise.all([api.services(), api.staff()])
       .then(([svc, stf]) => {
         setServices(svc);
         setStaff(stf);
+        const category = new URLSearchParams(window.location.search)
+          .get("category")
+          ?.toUpperCase();
+        if (category) {
+          const match = svc.find((s) => s.category.toUpperCase() === category);
+          if (match) setServiceId(match.id);
+        }
       })
       .catch((e) => setError(e.message));
   }, []);

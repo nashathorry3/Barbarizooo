@@ -51,6 +51,14 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
 - **Payments (deposits)** — provider-agnostic gateway with a simulated implementation
   (swappable for Stripe). Customer takes a deposit (`POST /api/v1/payments/deposit` +
   `/confirm`); owners/managers see payments (`GET /api/v1/payments`). Deposit % is configurable.
+  A new booking is held **PENDING** until the deposit is paid, then promoted to **CONFIRMED**.
+- **Reminders** — on confirmation, a confirmation + 24h + 2h pre-visit reminder are scheduled
+  (Email/WhatsApp) and dispatched by a scheduler (or `POST /api/v1/reminders/dispatch`). A
+  channel-agnostic `NotificationSender` (simulated) is swappable for real WhatsApp/Email/SMS.
+- **AI Hairstyle Preview** — consent-gated session, a real recommendation engine ranking styles
+  by face shape + gender + German trend score (`GET /api/v1/studio/recommendations`), and a
+  "Book this look" deep link. Photo-realistic rendering is intentionally **stubbed** (returns a
+  clearly-labeled SIMULATED status) since it needs a GPU vision model.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
 - Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement

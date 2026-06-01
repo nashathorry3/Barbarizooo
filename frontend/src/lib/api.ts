@@ -110,6 +110,42 @@ export interface Payment {
   createdAt: string;
 }
 
+export interface Reminder {
+  id: string;
+  bookingId: string;
+  type: string;
+  channel: string;
+  recipient: string;
+  body: string;
+  sendAt: string;
+  status: string;
+  sentAt: string | null;
+}
+
+export interface StudioSession {
+  sessionId: string;
+  privacyNotice: string;
+}
+
+export interface Hairstyle {
+  id: string;
+  name: string;
+  category: string;
+  gender: string;
+  trendScore: number;
+  recommendedCategory: string;
+  description: string;
+  matchScore: number;
+}
+
+export interface PreviewResult {
+  styleId: string;
+  styleName: string;
+  renderStatus: string;
+  message: string;
+  recommendedCategory: string;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
   const res = await fetch(`${API_BASE}${path}`, {
@@ -172,6 +208,25 @@ export const api = {
       method: "POST",
     }),
   payments: () => request<Payment[]>("/api/v1/payments"),
+  reminders: () => request<Reminder[]>("/api/v1/reminders"),
+  dispatchReminders: () =>
+    request<{ sent: number }>("/api/v1/reminders/dispatch", { method: "POST" }),
+  studioSession: (consent: boolean) =>
+    request<StudioSession>("/api/v1/studio/session", {
+      method: "POST",
+      body: JSON.stringify({ consent }),
+    }),
+  recommendations: (faceShape?: string, gender?: string) => {
+    const params = new URLSearchParams();
+    if (faceShape) params.set("faceShape", faceShape);
+    if (gender) params.set("gender", gender);
+    return request<Hairstyle[]>(`/api/v1/studio/recommendations?${params}`);
+  },
+  studioPreview: (sessionId: string, styleId: string, faceShape?: string) =>
+    request<PreviewResult>("/api/v1/studio/preview", {
+      method: "POST",
+      body: JSON.stringify({ sessionId, styleId, faceShape }),
+    }),
 };
 
 export function euro(cents: number): string {

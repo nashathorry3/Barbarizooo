@@ -4,8 +4,10 @@ import com.barbarizoo.common.BadRequestException;
 import com.barbarizoo.common.NotFoundException;
 import com.barbarizoo.config.AppProperties;
 import com.barbarizoo.domain.Booking;
+import com.barbarizoo.domain.BookingStatus;
 import com.barbarizoo.domain.Payment;
 import com.barbarizoo.domain.PaymentStatus;
+import com.barbarizoo.notifications.ReminderService;
 import com.barbarizoo.payments.PaymentDtos.DepositIntentResponse;
 import com.barbarizoo.payments.PaymentDtos.PaymentDto;
 import com.barbarizoo.repo.BookingRepository;
@@ -25,13 +27,15 @@ public class PaymentService {
     private final BookingRepository bookings;
     private final PaymentGateway gateway;
     private final AppProperties properties;
+    private final ReminderService reminders;
 
     public PaymentService(PaymentRepository payments, BookingRepository bookings,
-                          PaymentGateway gateway, AppProperties properties) {
+                          PaymentGateway gateway, AppProperties properties, ReminderService reminders) {
         this.payments = payments;
         this.bookings = bookings;
         this.gateway = gateway;
         this.properties = properties;
+        this.reminders = reminders;
     }
 
     /** Computes the deposit amount for a price using the configured percentage. */
@@ -80,6 +84,17 @@ public class PaymentService {
         }
         PaymentGateway.Result result = gateway.confirm(providerRef);
         payment.setStatus(result.succeeded() ? PaymentStatus.SUCCEEDED : PaymentStatus.FAILED);
+
+        // A successful deposit promotes a held (PENDING) booking to CONFIRMED
+        // and triggers its confirmation + pre-visit reminders.
+        if (result.succeeded()) {
+            bookings.findById(payment.getBookingId()).ifPresent(booking -> {
+                if (booking.getStatus() == BookingStatus.PENDING) {
+                    booking.setStatus(BookingStatus.CONFIRMED);
+                    reminders.scheduleForBooking(booking);
+                }
+            });
+        }
         return toDto(payment);
     }
 

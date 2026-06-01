@@ -9,6 +9,7 @@ import {
   type Booking,
   type BookingStatus,
   type Payment,
+  type Reminder,
 } from "@/lib/api";
 import { getToken, getUser } from "@/lib/auth";
 
@@ -30,10 +31,11 @@ export default function DashboardPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const role = getUser()?.role;
-  const canSeePayments = role === "OWNER" || role === "MANAGER";
+  const canManage = role === "OWNER" || role === "MANAGER";
 
   function load() {
     setLoading(true);
@@ -42,9 +44,19 @@ export default function DashboardPage() {
       .then(setBookings)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-    // Payment listing is restricted to owners/managers.
-    if (canSeePayments) {
+    // Payment & reminder listings are restricted to owners/managers.
+    if (canManage) {
       api.payments().then(setPayments).catch(() => {});
+      api.reminders().then(setReminders).catch(() => {});
+    }
+  }
+
+  async function dispatchReminders() {
+    try {
+      await api.dispatchReminders();
+      load();
+    } catch (e) {
+      setError((e as Error).message);
     }
   }
 
@@ -162,7 +174,7 @@ export default function DashboardPage() {
         </table>
       </div>
 
-      {canSeePayments && (
+      {canManage && (
         <section>
           <h2 className="mb-2 text-lg font-semibold">Deposits &amp; payments</h2>
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -203,6 +215,66 @@ export default function DashboardPage() {
                           }`}
                         >
                           {p.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {canManage && (
+        <section>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Reminders</h2>
+            <button
+              onClick={dispatchReminders}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:border-slate-300"
+            >
+              Dispatch due
+            </button>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-slate-500">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Send at</th>
+                  <th className="px-4 py-3 font-medium">Type</th>
+                  <th className="px-4 py-3 font-medium">Channel</th>
+                  <th className="px-4 py-3 font-medium">Recipient</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reminders.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                      No reminders yet.
+                    </td>
+                  </tr>
+                ) : (
+                  reminders.map((r) => (
+                    <tr key={r.id} className="border-t border-slate-100">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {dateTimeLabel(r.sendAt)}
+                      </td>
+                      <td className="px-4 py-3">{r.type}</td>
+                      <td className="px-4 py-3">{r.channel}</td>
+                      <td className="px-4 py-3 text-slate-500">{r.recipient}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${
+                            r.status === "SENT"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : r.status === "FAILED"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          {r.status}
                         </span>
                       </td>
                     </tr>

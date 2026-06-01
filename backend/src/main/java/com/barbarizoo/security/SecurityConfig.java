@@ -47,6 +47,8 @@ public class SecurityConfig {
                                 "/api/v1/services", "/api/v1/staff", "/api/v1/availability").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings").permitAll()
                         .requestMatchers("/api/v1/payments/deposit/**").permitAll()
+                        // Public AI Hairstyle Preview (customer-facing):
+                        .requestMatchers("/api/v1/studio/**").permitAll()
                         // Everything else requires login; fine-grained roles via @PreAuthorize:
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

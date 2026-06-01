@@ -39,6 +39,18 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 | POST | `/api/v1/payments/deposit` | public | Start a deposit for a booking |
 | POST | `/api/v1/payments/deposit/{ref}/confirm` | public | Confirm the deposit (PSP webhook in prod) |
 | GET  | `/api/v1/payments` | **OWNER/MANAGER** | List payments |
+| GET  | `/api/v1/reminders` | **OWNER/MANAGER** | List scheduled/sent reminders |
+| POST | `/api/v1/reminders/dispatch` | **OWNER** | Send due reminders now |
+| POST | `/api/v1/studio/session` | public | Start a (consent-gated) preview session |
+| GET  | `/api/v1/studio/recommendations?faceShape&gender` | public | Ranked hairstyle suggestions |
+| POST | `/api/v1/studio/preview` | public | Preview a style (rendering stubbed) |
+
+**Booking ↔ deposit:** with `require-deposit=true` a booking is `PENDING` until the
+deposit is confirmed, then `CONFIRMED` (which schedules its reminders).
+**Reminders:** a `ReminderScheduler` dispatches due items every 30s via a
+`NotificationSender` (simulated; swap in WhatsApp/Email/SMS).
+**AI Hairstyle Preview:** the recommendation ranking is real; photo-realistic
+try-on is stubbed (`SIMULATED`) pending a GPU vision model.
 
 **Roles:** `OWNER` > `MANAGER` > `STAFF`, carried in the JWT and enforced with
 `@PreAuthorize`. **Payments:** a `simulated` gateway is the default
@@ -76,21 +88,21 @@ curl -X POST http://localhost:8080/api/v1/bookings \
 ## Layout
 
 ```
-api/         REST controllers + DTOs (catalog, availability, booking)
-auth/        Login/me + user management controllers, services, DTOs
-security/    JWT issue/verify, auth filter, Spring Security config (RBAC)
-payments/    Provider-agnostic gateway + simulated impl, service, controller
-service/     Application services (catalog, availability, booking)
-pricing/     Dynamic Pricing engine (rules-based "lite")
-domain/      JPA entities (incl. AppUser, Payment)
-repo/        Spring Data repositories
-tenant/      Multi-tenant request context
-common/      Error handling
-config/      Properties + demo data seeder
-resources/db/migration  Flyway schema (V1 core, V2 auth, V3 payments)
+api/           REST controllers + DTOs (catalog, availability, booking)
+auth/          Login/me + user management controllers, services, DTOs
+security/      JWT issue/verify, auth filter, Spring Security config (RBAC)
+payments/      Provider-agnostic gateway + simulated impl, service, controller
+notifications/ Reminder scheduling + dispatch, NotificationSender (simulated)
+studio/        AI Hairstyle Preview: recommendation engine + (stubbed) preview
+pricing/       Dynamic Pricing engine (rules-based "lite")
+domain/        JPA entities (AppUser, Payment, Reminder, Hairstyle, ...)
+repo/          Spring Data repositories
+tenant/        Multi-tenant request context
+common/        Error handling
+config/        Properties + demo data seeder
+resources/db/migration  Flyway (V1 core, V2 auth, V3 payments, V4 reminders, V5 hairstyle)
 ```
 
 ## Next steps (per `docs/`)
-- Real Stripe gateway behind `PaymentGateway`; refresh tokens; RLS on PostgreSQL.
-- Reminders (WhatsApp/Email), waitlist automation.
-- AI engines: Hairstyle Preview, ML Dynamic Pricing, Inventory Prediction, Receptionist.
+- Real Stripe gateway + GPU vision model behind their interfaces; refresh tokens; RLS.
+- Waitlist automation; ML Dynamic Pricing; Inventory Prediction; AI Receptionist.

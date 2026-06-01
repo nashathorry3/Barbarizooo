@@ -4,11 +4,13 @@ import com.barbarizoo.api.dto.Dtos.BookingDto;
 import com.barbarizoo.api.dto.Dtos.CreateBookingRequest;
 import com.barbarizoo.common.BadRequestException;
 import com.barbarizoo.common.NotFoundException;
+import com.barbarizoo.config.AppProperties;
 import com.barbarizoo.domain.Booking;
 import com.barbarizoo.domain.BookingStatus;
 import com.barbarizoo.domain.Customer;
 import com.barbarizoo.domain.ServiceEntity;
 import com.barbarizoo.domain.Staff;
+import com.barbarizoo.notifications.ReminderService;
 import com.barbarizoo.pricing.PricingService;
 import com.barbarizoo.repo.BookingRepository;
 import com.barbarizoo.repo.CustomerRepository;
@@ -34,14 +36,19 @@ public class BookingService {
     private final StaffRepository staff;
     private final CustomerRepository customers;
     private final PricingService pricing;
+    private final ReminderService reminders;
+    private final AppProperties properties;
 
     public BookingService(BookingRepository bookings, ServiceRepository services, StaffRepository staff,
-                          CustomerRepository customers, PricingService pricing) {
+                          CustomerRepository customers, PricingService pricing,
+                          ReminderService reminders, AppProperties properties) {
         this.bookings = bookings;
         this.services = services;
         this.staff = staff;
         this.customers = customers;
         this.pricing = pricing;
+        this.reminders = reminders;
+        this.properties = properties;
     }
 
     @Transactional(readOnly = true)
@@ -81,6 +88,10 @@ public class BookingService {
 
         Customer customer = resolveCustomer(tenant, req);
 
+        // With deposits required, the slot is held as PENDING until the deposit
+        // is paid (then promoted to CONFIRMED); otherwise it is confirmed now.
+        boolean requireDeposit = properties.getPayments().isRequireDeposit();
+
         Booking booking = new Booking();
         booking.setId(UUID.randomUUID());
         booking.setTenantId(tenant);
@@ -89,10 +100,14 @@ public class BookingService {
         booking.setServiceId(service.getId());
         booking.setStartsAt(start);
         booking.setEndsAt(end);
-        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setStatus(requireDeposit ? BookingStatus.PENDING : BookingStatus.CONFIRMED);
         booking.setPriceCents(pricing.priceForSlot(service, start));
         booking.setSource("WEB");
         bookings.save(booking);
+
+        if (!requireDeposit) {
+            reminders.scheduleForBooking(booking);
+        }
 
         return toDto(booking);
     }
