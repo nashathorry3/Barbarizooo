@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .headers(h -> h.frameOptions(f -> f.disable())) // allow H2 console
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/v1/auth/login", "/h2-console/**").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/google", "/h2-console/**").permitAll()
                         // Public customer-facing booking + deposit flow:
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/services", "/api/v1/staff", "/api/v1/availability").permitAll()

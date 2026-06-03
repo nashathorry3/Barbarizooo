@@ -24,7 +24,8 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 
 | Method | Path | Auth | Purpose |
 |--------|------|------|---------|
-| POST | `/api/v1/auth/login` | public | Sign in, returns JWT |
+| POST | `/api/v1/auth/login` | public | Sign in with email + password, returns JWT |
+| POST | `/api/v1/auth/google` | public | Sign in / sign up with a Google ID token |
 | GET  | `/api/v1/auth/me` | **bearer** | Current user |
 | GET  | `/api/v1/services` | public | List active services |
 | GET  | `/api/v1/staff` | public | List active staff |
@@ -62,6 +63,11 @@ requests use the `X-Tenant-Id` header, falling back to the seed demo salon
 `11111111-1111-1111-1111-111111111111`.
 
 **Demo login:** `owner@demo.barbarizoo` / `password123` (seeded on first start).
+
+**Google sign-in:** controlled by `barbarizoo.google.mode`. Default `mock` accepts a
+`mock|email|name|sub` token (so the flow is testable without Google) and creates the
+account on first use. Set `GOOGLE_AUTH_MODE=real` + `GOOGLE_CLIENT_ID` to verify real
+Google ID tokens. New Google accounts join the default tenant as `STAFF`.
 
 ```bash
 TOKEN=$(curl -s -X POST localhost:8080/api/v1/auth/login \

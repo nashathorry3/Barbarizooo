@@ -38,6 +38,14 @@ public class AppUser {
     @Column(name = "staff_id")
     private UUID staffId;
 
+    /** Auth provider: "local" (email+password) or "google". */
+    @Column(nullable = false)
+    private String provider = "local";
+
+    /** Provider subject id (e.g. Google "sub"); null for local accounts. */
+    @Column(name = "provider_sub")
+    private String providerSub;
+
     @Column(nullable = false)
     private boolean active = true;
 

@@ -62,7 +62,7 @@ export default function StudioPage() {
           Get style recommendations tailored to your face shape and current
           German trends, then book the matching service.
         </p>
-        <div className="rounded-xl border border-slate-200 bg-white p-6">
+        <div className="card p-6">
           <p className="text-sm text-slate-600">
             Your photo (if you provide one) is processed in the EU, never used to
             identify you, and deleted at the end of the session (GDPR).
@@ -104,7 +104,7 @@ export default function StudioPage() {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-6 rounded-xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-wrap gap-6 card p-5">
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-600">
             Face shape
@@ -167,7 +167,7 @@ export default function StudioPage() {
           {styles.map((s, i) => (
             <div
               key={s.id}
-              className="flex flex-col rounded-xl border border-slate-200 bg-white p-5"
+              className="flex flex-col card p-5"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{s.name}</h3>

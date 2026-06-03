@@ -180,6 +180,11 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ email, password }),
     }),
+  googleLogin: (idToken: string) =>
+    request<TokenResponse>("/api/v1/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ idToken }),
+    }),
   me: () => request<AuthUser>("/api/v1/auth/me"),
   services: () => request<Service[]>("/api/v1/services"),
   staff: () => request<Staff[]>("/api/v1/staff"),

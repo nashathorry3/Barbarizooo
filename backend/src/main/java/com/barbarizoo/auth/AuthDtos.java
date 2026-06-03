@@ -16,6 +16,9 @@ public final class AuthDtos {
             @NotBlank String password) {
     }
 
+    public record GoogleLoginRequest(@NotBlank String idToken) {
+    }
+
     public record UserDto(UUID id, String email, String displayName, String role, UUID tenantId) {
     }
 

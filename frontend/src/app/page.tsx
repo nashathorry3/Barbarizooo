@@ -163,7 +163,7 @@ export default function BookingPage() {
         )}
 
         {paid ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+          <div className="card p-6 text-center">
             <div className="text-3xl">💳</div>
             <p className="mt-2 font-medium text-slate-800">
               Deposit paid{depositCents ? ` — ${euro(depositCents)}` : ""}
@@ -179,7 +179,7 @@ export default function BookingPage() {
             </button>
           </div>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+          <div className="card p-6 text-center">
             <p className="font-medium text-slate-800">Secure your appointment</p>
             <p className="text-sm text-slate-500">
               Pay a small deposit now to confirm. The rest is paid in the salon.
@@ -210,12 +210,18 @@ export default function BookingPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Book an appointment</h1>
-        <p className="text-slate-500">
-          Choose a service, your stylist, and a time. Prices update with demand.
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-7 text-white shadow-card">
+        <p className="text-sm font-medium text-white/70">Barbarizoo Demo Barbershop · Berlin</p>
+        <h1 className="mt-1 text-3xl font-bold">Book your next look</h1>
+        <p className="mt-1 max-w-lg text-white/80">
+          Pick a service, your stylist, and a time — prices update live with demand.
+          Not sure what suits you?{" "}
+          <a href="/studio" className="font-semibold text-white underline">
+            Try the AI Preview
+          </a>
+          .
         </p>
-      </div>
+      </section>
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -225,7 +231,7 @@ export default function BookingPage() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Step 1: service */}
-        <section className="rounded-xl border border-slate-200 bg-white p-5">
+        <section className="card p-5">
           <h2 className="mb-3 font-semibold">1 · Service</h2>
           <div className="space-y-2">
             {services.map((s) => (
@@ -253,7 +259,7 @@ export default function BookingPage() {
         </section>
 
         {/* Step 2: staff + date */}
-        <section className="rounded-xl border border-slate-200 bg-white p-5">
+        <section className="card p-5">
           <h2 className="mb-3 font-semibold">2 · Stylist &amp; date</h2>
           <label className="mb-1 block text-sm font-medium text-slate-600">
             Stylist
@@ -287,13 +293,13 @@ export default function BookingPage() {
             value={date}
             min={todayPlus(0)}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2"
+            className="w-full input"
           />
         </section>
       </div>
 
       {/* Step 3: slots */}
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
+      <section className="card p-5">
         <h2 className="mb-3 font-semibold">3 · Pick a time</h2>
         {!serviceId || !staffId ? (
           <p className="text-sm text-slate-400">
@@ -332,27 +338,27 @@ export default function BookingPage() {
 
       {/* Step 4: details */}
       {slot && (
-        <section className="rounded-xl border border-slate-200 bg-white p-5">
+        <section className="card p-5">
           <h2 className="mb-3 font-semibold">4 · Your details</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <input
               placeholder="Full name *"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="rounded-lg border border-slate-200 px-3 py-2"
+              className="input"
             />
             <input
               placeholder="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border border-slate-200 px-3 py-2"
+              className="input"
             />
             <input
               placeholder="Phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="rounded-lg border border-slate-200 px-3 py-2"
+              className="input"
             />
           </div>
           <label className="mt-3 flex items-center gap-2 text-sm text-slate-600">

@@ -14,6 +14,7 @@ public class AppProperties {
     private Cors cors = new Cors();
     private Jwt jwt = new Jwt();
     private Payments payments = new Payments();
+    private Google google = new Google();
 
     public UUID getDefaultTenantId() {
         return defaultTenantId;
@@ -47,6 +48,14 @@ public class AppProperties {
         this.payments = payments;
     }
 
+    public Google getGoogle() {
+        return google;
+    }
+
+    public void setGoogle(Google google) {
+        this.google = google;
+    }
+
     public static class Cors {
         private String allowedOrigins = "http://localhost:3000";
 
@@ -77,6 +86,27 @@ public class AppProperties {
 
         public void setExpirationMinutes(long expirationMinutes) {
             this.expirationMinutes = expirationMinutes;
+        }
+    }
+
+    public static class Google {
+        private String mode = "mock";
+        private String clientId = "";
+
+        public String getMode() {
+            return mode;
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
         }
     }
 

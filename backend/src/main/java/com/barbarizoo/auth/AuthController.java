@@ -1,5 +1,6 @@
 package com.barbarizoo.auth;
 
+import com.barbarizoo.auth.AuthDtos.GoogleLoginRequest;
 import com.barbarizoo.auth.AuthDtos.LoginRequest;
 import com.barbarizoo.auth.AuthDtos.TokenResponse;
 import com.barbarizoo.auth.AuthDtos.UserDto;
@@ -25,6 +26,12 @@ public class AuthController {
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    /** Sign in or sign up with a Google ID token. */
+    @PostMapping("/google")
+    public TokenResponse google(@Valid @RequestBody GoogleLoginRequest request) {
+        return authService.loginWithGoogle(request);
     }
 
     @GetMapping("/me")

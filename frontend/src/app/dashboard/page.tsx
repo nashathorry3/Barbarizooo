@@ -111,7 +111,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
       {canManage && (
         <section>
           <h2 className="mb-2 text-lg font-semibold">Deposits &amp; payments</h2>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="card overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-slate-500">
                 <tr>
@@ -237,7 +237,7 @@ export default function DashboardPage() {
               Dispatch due
             </button>
           </div>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="card overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-slate-500">
                 <tr>
