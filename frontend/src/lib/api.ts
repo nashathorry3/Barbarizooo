@@ -201,7 +201,25 @@ export const api = {
     }),
   me: () => request<AuthUser>("/api/v1/auth/me"),
   salon: (ref: string) => request<Salon>(`/api/v1/salons/${ref}`),
+  updateSalon: (name: string, slug: string) =>
+    request<Salon>("/api/v1/salons", {
+      method: "PATCH",
+      body: JSON.stringify({ name, slug }),
+    }),
   services: () => request<Service[]>("/api/v1/services"),
+  createService: (input: {
+    name: string;
+    category: string;
+    durationMin: number;
+    basePriceCents: number;
+    staffIds: string[];
+  }) =>
+    request<Service>("/api/v1/services", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  deactivateService: (id: string) =>
+    request<void>(`/api/v1/services/${id}`, { method: "DELETE" }),
   staff: () => request<Staff[]>("/api/v1/staff"),
   availability: (serviceId: string, staffId: string, date: string) =>
     request<Availability>(

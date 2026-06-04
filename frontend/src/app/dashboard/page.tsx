@@ -12,6 +12,7 @@ import {
   type Reminder,
   type Salon,
 } from "@/lib/api";
+import SalonAdmin from "@/components/SalonAdmin";
 import { getToken, getUser } from "@/lib/auth";
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
@@ -327,6 +328,8 @@ export default function DashboardPage() {
           </div>
         </section>
       )}
+
+      {canManage && <SalonAdmin />}
     </div>
   );
 }

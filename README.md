@@ -67,6 +67,9 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
   `…/book/{slug}` (resolve via `GET /api/v1/salons/{ref}`). The booking page is tenant-aware, so
   each salon's customers see only that salon's services, staff, and prices. Owners copy their link
   from the dashboard (for Instagram bio, WhatsApp, QR codes).
+- **Salon self-management (dashboard)** — owners customize their booking-link slug + salon name
+  (`PATCH /api/v1/salons`, with normalization + uniqueness checks) and owners/managers add or
+  remove services, all from the dashboard.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
 - Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement

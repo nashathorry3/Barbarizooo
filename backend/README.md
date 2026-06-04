@@ -28,6 +28,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 | POST | `/api/v1/auth/google` | public | Sign in / sign up with a Google ID token |
 | GET  | `/api/v1/auth/me` | **bearer** | Current user |
 | GET  | `/api/v1/salons/{ref}` | public | Resolve a salon by slug or id (for its booking page) |
+| PATCH | `/api/v1/salons` | **OWNER** | Update this salon's name + booking-link slug |
 | GET  | `/api/v1/services` | public | List active services |
 | GET  | `/api/v1/staff` | public | List active staff |
 | GET  | `/api/v1/availability?serviceId&staffId&date` | public | Free slots + dynamic price |
