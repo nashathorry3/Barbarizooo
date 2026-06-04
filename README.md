@@ -52,10 +52,12 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
 - **Role-based access control (RBAC)** — `OWNER` / `MANAGER` / `STAFF`. Managing the service
   catalog (`POST`/`DELETE /api/v1/services`) is owner/manager-only; user management
   (`GET`/`POST /api/v1/users`) is owner-only for create. Enforced via `@PreAuthorize`.
-- **Payments (deposits)** — provider-agnostic gateway with a simulated implementation
-  (swappable for Stripe). Customer takes a deposit (`POST /api/v1/payments/deposit` +
-  `/confirm`); owners/managers see payments (`GET /api/v1/payments`). Deposit % is configurable.
-  A new booking is held **PENDING** until the deposit is paid, then promoted to **CONFIRMED**.
+- **Payments (deposits) — real Stripe or simulated** — provider-agnostic gateway. The default
+  `simulated` mode works with zero setup; set `PAYMENTS_PROVIDER=stripe` + `STRIPE_SECRET_KEY`
+  (backend) and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (frontend) to collect real cards via Stripe.js
+  Payment Element, confirmed by a signature-verified Stripe webhook. Customer takes a deposit
+  (`POST /api/v1/payments/deposit` + `/confirm`); owners/managers see payments. A new booking is
+  held **PENDING** until the deposit is paid, then promoted to **CONFIRMED**.
 - **Reminders** — on confirmation, a confirmation + 24h + 2h pre-visit reminder are scheduled
   (Email/WhatsApp) and dispatched by a scheduler (or `POST /api/v1/reminders/dispatch`). A
   channel-agnostic `NotificationSender` (simulated) is swappable for real WhatsApp/Email/SMS.

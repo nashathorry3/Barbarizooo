@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 "/api/v1/services", "/api/v1/staff", "/api/v1/availability").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings").permitAll()
                         .requestMatchers("/api/v1/payments/deposit/**").permitAll()
+                        .requestMatchers("/api/v1/payments/webhook/**").permitAll()
                         // Public AI Hairstyle Preview (customer-facing):
                         .requestMatchers("/api/v1/studio/**").permitAll()
                         // Public salon lookup (renders the per-salon booking page):

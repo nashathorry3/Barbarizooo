@@ -44,8 +44,11 @@ barbarizoo:
     deposit-percent: 30
     # When true, a new booking stays PENDING until the deposit is paid, then CONFIRMED.
     require-deposit: true
-    # "simulated" (default, no external account) or "stripe" (real, future).
-    provider: simulated
+    # "simulated" (default, no external account) or "stripe" (real).
+    provider: ${PAYMENTS_PROVIDER:simulated}
+    # Required when provider=stripe.
+    stripe-secret-key: ${STRIPE_SECRET_KEY:}
+    stripe-webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
 
 logging:
   level:

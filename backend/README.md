@@ -39,8 +39,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 | POST | `/api/v1/bookings` | public | Create a booking (customer flow) |
 | GET  | `/api/v1/bookings` | **bearer** | List bookings (dashboard) |
 | PATCH| `/api/v1/bookings/{id}/status` | **bearer** | Update booking status |
-| POST | `/api/v1/payments/deposit` | public | Start a deposit for a booking |
-| POST | `/api/v1/payments/deposit/{ref}/confirm` | public | Confirm the deposit (PSP webhook in prod) |
+| POST | `/api/v1/payments/deposit` | public | Start a deposit for a booking (returns client secret) |
+| POST | `/api/v1/payments/deposit/{ref}/confirm` | public | Verify/confirm the deposit |
+| POST | `/api/v1/payments/webhook/stripe` | public | Stripe webhook (signature-verified) |
 | GET  | `/api/v1/payments` | **OWNER/MANAGER** | List payments |
 | GET  | `/api/v1/reminders` | **OWNER/MANAGER** | List scheduled/sent reminders |
 | POST | `/api/v1/reminders/dispatch` | **OWNER** | Send due reminders now |
@@ -56,9 +57,11 @@ deposit is confirmed, then `CONFIRMED` (which schedules its reminders).
 try-on is stubbed (`SIMULATED`) pending a GPU vision model.
 
 **Roles:** `OWNER` > `MANAGER` > `STAFF`, carried in the JWT and enforced with
-`@PreAuthorize`. **Payments:** a `simulated` gateway is the default
-(`barbarizoo.payments.provider`); deposit size is `barbarizoo.payments.deposit-percent`
-(default 30%). A Stripe gateway can be dropped in behind the `PaymentGateway` interface.
+`@PreAuthorize`. **Payments:** a `simulated` gateway is the default (`barbarizoo.payments.provider`);
+deposit size is `barbarizoo.payments.deposit-percent` (default 30%). Set
+`PAYMENTS_PROVIDER=stripe` + `STRIPE_SECRET_KEY` (and `STRIPE_WEBHOOK_SECRET`) to use
+the real **Stripe** gateway: it creates a PaymentIntent (client completes payment with
+Stripe.js), and `payment_intent.succeeded` webhooks confirm the deposit and the booking.
 
 **Tenancy:** authenticated requests derive the tenant from the JWT. Public
 requests use the `X-Tenant-Id` header, falling back to the seed demo salon

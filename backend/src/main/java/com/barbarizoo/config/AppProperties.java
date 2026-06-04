@@ -114,6 +114,8 @@ public class AppProperties {
         private int depositPercent = 30;
         private boolean requireDeposit = true;
         private String provider = "simulated";
+        private String stripeSecretKey = "";
+        private String stripeWebhookSecret = "";
 
         public int getDepositPercent() {
             return depositPercent;
@@ -137,6 +139,22 @@ public class AppProperties {
 
         public void setProvider(String provider) {
             this.provider = provider;
+        }
+
+        public String getStripeSecretKey() {
+            return stripeSecretKey;
+        }
+
+        public void setStripeSecretKey(String stripeSecretKey) {
+            this.stripeSecretKey = stripeSecretKey;
+        }
+
+        public String getStripeWebhookSecret() {
+            return stripeWebhookSecret;
+        }
+
+        public void setStripeWebhookSecret(String stripeWebhookSecret) {
+            this.stripeWebhookSecret = stripeWebhookSecret;
         }
     }
 }

@@ -84,18 +84,37 @@ public class PaymentService {
         }
         PaymentGateway.Result result = gateway.confirm(providerRef);
         payment.setStatus(result.succeeded() ? PaymentStatus.SUCCEEDED : PaymentStatus.FAILED);
-
-        // A successful deposit promotes a held (PENDING) booking to CONFIRMED
-        // and triggers its confirmation + pre-visit reminders.
         if (result.succeeded()) {
-            bookings.findById(payment.getBookingId()).ifPresent(booking -> {
-                if (booking.getStatus() == BookingStatus.PENDING) {
-                    booking.setStatus(BookingStatus.CONFIRMED);
-                    reminders.scheduleForBooking(booking);
-                }
-            });
+            promoteBooking(payment);
         }
         return toDto(payment);
+    }
+
+    /**
+     * Marks a payment succeeded from an out-of-band provider event (e.g. a Stripe
+     * webhook), then promotes the booking. Idempotent.
+     */
+    @Transactional
+    public void markSucceededByRef(String providerRef) {
+        payments.findByProviderRef(providerRef).ifPresent(payment -> {
+            if (payment.getStatus() != PaymentStatus.SUCCEEDED) {
+                payment.setStatus(PaymentStatus.SUCCEEDED);
+                promoteBooking(payment);
+            }
+        });
+    }
+
+    /**
+     * A successful deposit promotes a held (PENDING) booking to CONFIRMED and
+     * triggers its confirmation + pre-visit reminders.
+     */
+    private void promoteBooking(Payment payment) {
+        bookings.findById(payment.getBookingId()).ifPresent(booking -> {
+            if (booking.getStatus() == BookingStatus.PENDING) {
+                booking.setStatus(BookingStatus.CONFIRMED);
+                reminders.scheduleForBooking(booking);
+            }
+        });
     }
 
     @Transactional(readOnly = true)

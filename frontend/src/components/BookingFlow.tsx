@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import StripeDepositForm, { stripeEnabled } from "@/components/StripeDepositForm";
 import {
   api,
   euro,
@@ -49,6 +50,8 @@ export default function BookingFlow({
   // Post-booking deposit flow.
   const [booked, setBooked] = useState<Booking | null>(null);
   const [depositCents, setDepositCents] = useState<number | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [providerRef, setProviderRef] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
   const [paid, setPaid] = useState(false);
 
@@ -121,7 +124,8 @@ export default function BookingFlow({
     }
   }
 
-  async function payDeposit() {
+  // Simulated provider: one-click create + confirm.
+  async function paySimulated() {
     if (!booked) return;
     setPaying(true);
     setError(null);
@@ -141,9 +145,39 @@ export default function BookingFlow({
     }
   }
 
+  // Stripe: create the intent, then collect the card with the Payment Element.
+  async function startStripeDeposit() {
+    if (!booked) return;
+    setPaying(true);
+    setError(null);
+    try {
+      const intent = await api.createDeposit(booked.id);
+      setDepositCents(intent.amountCents);
+      setProviderRef(intent.providerRef);
+      setClientSecret(intent.clientSecret);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setPaying(false);
+    }
+  }
+
+  // Called once Stripe confirms the card payment client-side; syncs the backend
+  // (the Stripe webhook is the authoritative path in production).
+  async function onStripePaid() {
+    try {
+      if (providerRef) await api.confirmDeposit(providerRef);
+    } catch {
+      // Webhook will reconcile even if this sync call fails.
+    }
+    setPaid(true);
+  }
+
   function reset() {
     setBooked(null);
     setDepositCents(null);
+    setClientSecret(null);
+    setProviderRef(null);
     setPaid(false);
     setName("");
     setEmail("");
@@ -184,17 +218,38 @@ export default function BookingFlow({
           <div className="card p-6 text-center">
             <p className="font-medium text-slate-800">Secure your appointment</p>
             <p className="text-sm text-slate-500">
-              Pay a small deposit now to confirm. The rest is paid in the salon.
+              Pay a small deposit{depositCents ? ` (${euro(depositCents)})` : ""} now to confirm.
+              The rest is paid in the salon.
             </p>
-            <div className="mt-4 flex gap-2">
-              <button onClick={payDeposit} disabled={paying} className="btn-primary flex-1">
-                {paying ? "Processing…" : "Pay deposit"}
-              </button>
-              <button onClick={reset} className="btn-ghost">
-                Later
-              </button>
-            </div>
-            <p className="mt-3 text-xs text-slate-400">Test mode — no real card is charged.</p>
+
+            {stripeEnabled && clientSecret ? (
+              <div className="mt-4">
+                <StripeDepositForm clientSecret={clientSecret} onPaid={onStripePaid} />
+                <button onClick={reset} className="btn-ghost mt-2 w-full">
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={stripeEnabled ? startStripeDeposit : paySimulated}
+                    disabled={paying}
+                    className="btn-primary flex-1"
+                  >
+                    {paying ? "Processing…" : "Pay deposit"}
+                  </button>
+                  <button onClick={reset} className="btn-ghost">
+                    Later
+                  </button>
+                </div>
+                <p className="mt-3 text-xs text-slate-400">
+                  {stripeEnabled
+                    ? "Secured by Stripe."
+                    : "Test mode — no real card is charged."}
+                </p>
+              </>
+            )}
           </div>
         )}
       </div>
