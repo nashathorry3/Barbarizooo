@@ -6,7 +6,6 @@ import com.barbarizoo.auth.AuthDtos.TokenResponse;
 import com.barbarizoo.auth.AuthDtos.UserDto;
 import com.barbarizoo.auth.google.GoogleTokenVerifier;
 import com.barbarizoo.auth.google.GoogleTokenVerifier.VerifiedGoogleUser;
-import com.barbarizoo.config.AppProperties;
 import com.barbarizoo.domain.AppUser;
 import com.barbarizoo.repo.AppUserRepository;
 import com.barbarizoo.security.AuthPrincipal;
@@ -16,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 public class AuthService {
 
@@ -25,15 +22,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final GoogleTokenVerifier googleVerifier;
-    private final AppProperties properties;
+    private final SalonOnboardingService onboarding;
 
     public AuthService(AppUserRepository users, PasswordEncoder passwordEncoder, JwtService jwtService,
-                       GoogleTokenVerifier googleVerifier, AppProperties properties) {
+                       GoogleTokenVerifier googleVerifier, SalonOnboardingService onboarding) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.googleVerifier = googleVerifier;
-        this.properties = properties;
+        this.onboarding = onboarding;
     }
 
     @Transactional(readOnly = true)
@@ -54,9 +51,11 @@ public class AuthService {
         if (!g.emailVerified()) {
             throw new BadCredentialsException("Google email is not verified");
         }
+        // Existing account → sign in. New account → provision a fresh salon (the
+        // owner gets their own tenant), making salon onboarding a single Google click.
         AppUser user = users.findByEmailIgnoreCaseAndActiveTrue(g.email())
                 .map(existing -> linkGoogle(existing, g))
-                .orElseGet(() -> createGoogleUser(g));
+                .orElseGet(() -> onboarding.registerGoogleSalon(g));
         JwtService.IssuedToken issued = jwtService.issue(user);
         return new TokenResponse(issued.token(), issued.expiresAt(), toDto(user));
     }
@@ -68,23 +67,6 @@ public class AuthService {
             user.setProviderSub(g.sub());
         }
         return user;
-    }
-
-    private AppUser createGoogleUser(VerifiedGoogleUser g) {
-        AppUser user = new AppUser();
-        user.setId(UUID.randomUUID());
-        // New self-service Google accounts join the default tenant as STAFF.
-        // (Production: create a new salon/tenant + OWNER, or join by invitation.)
-        user.setTenantId(properties.getDefaultTenantId());
-        user.setEmail(g.email());
-        user.setDisplayName(g.name());
-        user.setRole("STAFF");
-        user.setProvider("google");
-        user.setProviderSub(g.sub());
-        // OAuth accounts have no usable password; store a random unguessable hash.
-        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
-        user.setActive(true);
-        return users.save(user);
     }
 
     public UserDto me(AuthPrincipal principal) {

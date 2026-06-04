@@ -7,9 +7,10 @@ export default function SignupPage() {
   return (
     <div className="mx-auto max-w-sm">
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold">Create your account</h1>
+        <h1 className="text-2xl font-bold">Register your salon</h1>
         <p className="text-slate-500">
-          Get started in seconds with Google — no password to remember.
+          One click with Google — no forms, no password. We set up your salon
+          instantly so you can start taking bookings.
         </p>
       </div>
 
@@ -18,13 +19,13 @@ export default function SignupPage() {
 
         <ul className="mt-5 space-y-2 text-sm text-slate-500">
           <li className="flex items-center gap-2">
-            <span className="text-brand">✓</span> Smart booking &amp; reminders
+            <span className="text-brand">✓</span> Your salon &amp; owner account created automatically
           </li>
           <li className="flex items-center gap-2">
-            <span className="text-brand">✓</span> AI hairstyle recommendations
+            <span className="text-brand">✓</span> Starter services ready — edit anytime
           </li>
           <li className="flex items-center gap-2">
-            <span className="text-brand">✓</span> Deposits, payments &amp; reports
+            <span className="text-brand">✓</span> Smart booking, AI preview, deposits &amp; reports
           </li>
         </ul>
 

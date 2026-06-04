@@ -42,11 +42,13 @@ to manage bookings. The seed salon ("Barbarizoo Demo Barbershop Berlin") comes w
 services and two stylists. Prices shift with demand via the rules-based Dynamic Pricing engine.
 
 ### Implemented in this MVP slice
-- **Authentication** — JWT login (`POST /api/v1/auth/login`, `GET /api/v1/auth/me`) **plus
-  Sign in / Sign up with Google** (`POST /api/v1/auth/google`): the backend verifies the Google
-  ID token and issues an app JWT, creating the account on first use. A `mock` verifier (default)
-  makes this testable locally; set `GOOGLE_AUTH_MODE=real` + `GOOGLE_CLIENT_ID` for production.
-  Dashboard requires sign-in; the customer booking flow stays public. Demo: `owner@demo.barbarizoo` / `password123`.
+- **Authentication & one-click salon sign-up** — JWT login (`POST /api/v1/auth/login`,
+  `GET /api/v1/auth/me`) **plus Sign in / Sign up with Google** (`POST /api/v1/auth/google`).
+  A first-time Google sign-up **provisions a new salon (tenant) with the user as OWNER** and
+  seeds a starter setup, so salons onboard in one click. The backend verifies the Google ID
+  token and issues an app JWT; a `mock` verifier (default) makes this testable locally, set
+  `GOOGLE_AUTH_MODE=real` + `GOOGLE_CLIENT_ID` for production. Dashboard requires sign-in; the
+  customer booking flow stays public. Demo: `owner@demo.barbarizoo` / `password123`.
 - **Role-based access control (RBAC)** — `OWNER` / `MANAGER` / `STAFF`. Managing the service
   catalog (`POST`/`DELETE /api/v1/services`) is owner/manager-only; user management
   (`GET`/`POST /api/v1/users`) is owner-only for create. Enforced via `@PreAuthorize`.

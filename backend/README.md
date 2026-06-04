@@ -64,10 +64,12 @@ requests use the `X-Tenant-Id` header, falling back to the seed demo salon
 
 **Demo login:** `owner@demo.barbarizoo` / `password123` (seeded on first start).
 
-**Google sign-in:** controlled by `barbarizoo.google.mode`. Default `mock` accepts a
-`mock|email|name|sub` token (so the flow is testable without Google) and creates the
-account on first use. Set `GOOGLE_AUTH_MODE=real` + `GOOGLE_CLIENT_ID` to verify real
-Google ID tokens. New Google accounts join the default tenant as `STAFF`.
+**Google sign-in / salon sign-up:** controlled by `barbarizoo.google.mode`. Default
+`mock` accepts a `mock|email|name|sub` token (so the flow is testable without Google).
+Set `GOOGLE_AUTH_MODE=real` + `GOOGLE_CLIENT_ID` to verify real Google ID tokens.
+**First-time Google sign-up provisions a brand-new salon (tenant)** with the user as
+`OWNER` and seeds a starter setup (owner-as-stylist + Haircut/Beard Trim services), so
+salon onboarding is a single click. Returning users simply sign in to their salon.
 
 ```bash
 TOKEN=$(curl -s -X POST localhost:8080/api/v1/auth/login \
