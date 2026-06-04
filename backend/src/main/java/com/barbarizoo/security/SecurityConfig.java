@@ -49,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/payments/deposit/**").permitAll()
                         // Public AI Hairstyle Preview (customer-facing):
                         .requestMatchers("/api/v1/studio/**").permitAll()
+                        // Public salon lookup (renders the per-salon booking page):
+                        .requestMatchers(HttpMethod.GET, "/api/v1/salons/**").permitAll()
                         // Everything else requires login; fine-grained roles via @PreAuthorize:
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

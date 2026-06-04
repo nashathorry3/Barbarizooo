@@ -10,6 +10,7 @@ import {
   type BookingStatus,
   type Payment,
   type Reminder,
+  type Salon,
 } from "@/lib/api";
 import { getToken, getUser } from "@/lib/auth";
 
@@ -32,10 +33,18 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [salon, setSalon] = useState<Salon | null>(null);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const role = getUser()?.role;
+  const user = getUser();
+  const role = user?.role;
   const canManage = role === "OWNER" || role === "MANAGER";
+
+  const bookingUrl =
+    salon && typeof window !== "undefined"
+      ? `${window.location.origin}/book/${salon.slug ?? salon.id}`
+      : "";
 
   function load() {
     setLoading(true);
@@ -44,11 +53,22 @@ export default function DashboardPage() {
       .then(setBookings)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+    if (user) {
+      api.salon(user.tenantId).then(setSalon).catch(() => {});
+    }
     // Payment & reminder listings are restricted to owners/managers.
     if (canManage) {
       api.payments().then(setPayments).catch(() => {});
       api.reminders().then(setReminders).catch(() => {});
     }
+  }
+
+  function copyLink() {
+    if (!bookingUrl) return;
+    navigator.clipboard.writeText(bookingUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
   }
 
   async function dispatchReminders() {
@@ -104,6 +124,28 @@ export default function DashboardPage() {
           Refresh
         </button>
       </div>
+
+      {salon && (
+        <div className="card flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold">{salon.name}</p>
+            <p className="text-sm text-slate-500">
+              Share your public booking link — put it in your Instagram bio, WhatsApp, or a QR code.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <code className="max-w-[16rem] truncate rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-600">
+              {bookingUrl}
+            </code>
+            <button onClick={copyLink} className="btn-ghost whitespace-nowrap">
+              {copied ? "Copied ✓" : "Copy link"}
+            </button>
+            <a href={bookingUrl} target="_blank" rel="noreferrer" className="btn-primary whitespace-nowrap">
+              Open
+            </a>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

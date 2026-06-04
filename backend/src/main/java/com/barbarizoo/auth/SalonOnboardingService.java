@@ -50,6 +50,7 @@ public class SalonOnboardingService {
         Location salon = new Location();
         salon.setId(UUID.randomUUID());
         salon.setName(deriveSalonName(g));
+        salon.setSlug(uniqueSlug(salon.getName()));
         locations.save(salon);
 
         Staff owner = new Staff();
@@ -103,5 +104,20 @@ public class SalonOnboardingService {
                 ? g.name().trim()
                 : g.email().split("@")[0];
         return base + "'s Salon";
+    }
+
+    /** Builds a URL-safe, unique slug from the salon name (e.g. "Sara's Salon" -> "saras-salon"). */
+    private String uniqueSlug(String name) {
+        String base = name.toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+)|(-+$)", "");
+        if (base.isBlank()) {
+            base = "salon";
+        }
+        String candidate = base;
+        while (locations.existsBySlugIgnoreCase(candidate)) {
+            candidate = base + "-" + UUID.randomUUID().toString().substring(0, 4);
+        }
+        return candidate;
     }
 }

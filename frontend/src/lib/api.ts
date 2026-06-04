@@ -3,8 +3,22 @@
 import { getToken } from "./auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080";
-const TENANT_ID =
+const DEFAULT_TENANT_ID =
   process.env.NEXT_PUBLIC_TENANT_ID ?? "11111111-1111-1111-1111-111111111111";
+
+// The salon (tenant) the public booking flow currently targets. The per-salon
+// booking page sets this from the URL; otherwise it falls back to the default.
+let activeTenant = DEFAULT_TENANT_ID;
+
+export function setActiveTenant(id?: string): void {
+  activeTenant = id && id.trim() ? id : DEFAULT_TENANT_ID;
+}
+
+export interface Salon {
+  id: string;
+  name: string;
+  slug: string | null;
+}
 
 export interface AuthUser {
   id: string;
@@ -154,7 +168,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       "Content-Type": "application/json",
       // Public booking flow identifies the salon via header; authenticated
       // requests derive the tenant from the token instead.
-      "X-Tenant-Id": TENANT_ID,
+      "X-Tenant-Id": activeTenant,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
@@ -186,6 +200,7 @@ export const api = {
       body: JSON.stringify({ idToken }),
     }),
   me: () => request<AuthUser>("/api/v1/auth/me"),
+  salon: (ref: string) => request<Salon>(`/api/v1/salons/${ref}`),
   services: () => request<Service[]>("/api/v1/services"),
   staff: () => request<Staff[]>("/api/v1/staff"),
   availability: (serviceId: string, staffId: string, date: string) =>

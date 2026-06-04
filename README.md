@@ -63,6 +63,10 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
   by face shape + gender + German trend score (`GET /api/v1/studio/recommendations`), and a
   "Book this look" deep link. Photo-realistic rendering is intentionally **stubbed** (returns a
   clearly-labeled SIMULATED status) since it needs a GPU vision model.
+- **Per-salon public booking links** — every salon gets a unique slug and a shareable link
+  `…/book/{slug}` (resolve via `GET /api/v1/salons/{ref}`). The booking page is tenant-aware, so
+  each salon's customers see only that salon's services, staff, and prices. Owners copy their link
+  from the dashboard (for Instagram bio, WhatsApp, QR codes).
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
 - Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement

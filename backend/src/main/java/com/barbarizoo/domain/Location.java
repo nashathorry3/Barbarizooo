@@ -24,6 +24,10 @@ public class Location {
     @Column(nullable = false)
     private String name;
 
+    /** URL slug for the public booking link (/book/{slug}). */
+    @Column
+    private String slug;
+
     @Column(nullable = false)
     private String timezone = "Europe/Berlin";
 
