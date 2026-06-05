@@ -1,0 +1,33 @@
+name: Deploy to VPS
+
+# Auto-deploys to the Hostinger KVM VPS over SSH.
+# Triggers on push to main, or manually from the Actions tab.
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false # never interrupt an in-flight deploy
+
+jobs:
+  deploy:
+    name: SSH → git pull → docker compose up
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          # APP_DIR defaults to ~/Barbarizooo if the secret is unset.
+          script: |
+            set -e
+            cd "${{ secrets.VPS_APP_DIR || '~/Barbarizooo' }}"
+            git pull --ff-only
+            docker compose up -d --build
+            docker image prune -f
+            docker compose ps

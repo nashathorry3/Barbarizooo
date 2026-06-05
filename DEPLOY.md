@@ -58,6 +58,36 @@ docker compose down          # stop everything (data is kept)
 > Generate a strong JWT secret with `openssl rand -base64 48`.
 > Open ports 80 + 443 in Hostinger's firewall (hPanel → VPS → Firewall).
 
+### Auto-deploy on every push (GitHub Action)
+
+[`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) SSHes into the VPS
+and runs `git pull && docker compose up -d --build` on every push to `main` (or
+manually from the **Actions** tab).
+
+**One-time setup:**
+
+1. On the VPS, create a deploy SSH key and authorise it:
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -N ""
+   cat ~/.ssh/deploy_key.pub >> ~/.ssh/authorized_keys
+   cat ~/.ssh/deploy_key            # copy the PRIVATE key for the secret below
+   ```
+2. In GitHub → repo **Settings → Secrets and variables → Actions**, add:
+
+   | Secret | Value | Required |
+   |---|---|---|
+   | `VPS_HOST` | VPS IP or hostname | yes |
+   | `VPS_USER` | SSH user (e.g. `root`) | yes |
+   | `VPS_SSH_KEY` | the **private** deploy key (full contents) | yes |
+   | `VPS_PORT` | SSH port | no (default `22`) |
+   | `VPS_APP_DIR` | repo path on the VPS | no (default `~/Barbarizooo`) |
+
+3. Make sure the repo is already cloned on the VPS (the first deploy in
+   **Option C** above) and checked out on the branch you push to.
+
+After that, every push to `main` redeploys automatically. `.env` stays on the
+server and is never touched by the deploy.
+
 ---
 
 ## Option A — One-click with Render Blueprint (easiest)
