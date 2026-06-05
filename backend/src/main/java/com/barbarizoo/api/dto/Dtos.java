@@ -36,6 +36,16 @@ public final class Dtos {
             UUID id, String displayName, String role, String seniorityLevel, String color) {
     }
 
+    public record CreateStaffRequest(
+            @NotBlank String displayName,
+            String role,
+            String seniorityLevel,
+            String color) {
+    }
+
+    public record UpdateServiceStaffRequest(List<UUID> staffIds) {
+    }
+
     /** A bookable slot with its dynamically-computed price. */
     public record SlotDto(LocalDateTime start, LocalDateTime end, int priceCents) {
     }

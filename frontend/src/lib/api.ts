@@ -221,6 +221,23 @@ export const api = {
   deactivateService: (id: string) =>
     request<void>(`/api/v1/services/${id}`, { method: "DELETE" }),
   staff: () => request<Staff[]>("/api/v1/staff"),
+  createStaff: (input: {
+    displayName: string;
+    role?: string;
+    seniorityLevel?: string;
+    color?: string;
+  }) =>
+    request<Staff>("/api/v1/staff", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  deactivateStaff: (id: string) =>
+    request<void>(`/api/v1/staff/${id}`, { method: "DELETE" }),
+  updateServiceStaff: (serviceId: string, staffIds: string[]) =>
+    request<Service>(`/api/v1/services/${serviceId}/staff`, {
+      method: "PUT",
+      body: JSON.stringify({ staffIds }),
+    }),
   availability: (serviceId: string, staffId: string, date: string) =>
     request<Availability>(
       `/api/v1/availability?serviceId=${serviceId}&staffId=${staffId}&date=${date}`

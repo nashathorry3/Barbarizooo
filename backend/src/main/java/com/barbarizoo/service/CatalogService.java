@@ -1,8 +1,10 @@
 package com.barbarizoo.service;
 
 import com.barbarizoo.api.dto.Dtos.CreateServiceRequest;
+import com.barbarizoo.api.dto.Dtos.CreateStaffRequest;
 import com.barbarizoo.api.dto.Dtos.ServiceDto;
 import com.barbarizoo.api.dto.Dtos.StaffDto;
+import com.barbarizoo.api.dto.Dtos.UpdateServiceStaffRequest;
 import com.barbarizoo.common.NotFoundException;
 import com.barbarizoo.domain.ServiceEntity;
 import com.barbarizoo.domain.Staff;
@@ -69,6 +71,39 @@ public class CatalogService {
         ServiceEntity entity = services.findByIdAndTenantId(id, tenant)
                 .orElseThrow(() -> new NotFoundException("Service not found"));
         entity.setActive(false);
+    }
+
+    @Transactional
+    public StaffDto createStaff(CreateStaffRequest req) {
+        UUID tenant = TenantContext.get();
+        Staff entity = new Staff();
+        entity.setId(UUID.randomUUID());
+        entity.setTenantId(tenant);
+        entity.setDisplayName(req.displayName());
+        entity.setRole(req.role() != null ? req.role() : "STYLIST");
+        entity.setSeniorityLevel(req.seniorityLevel() != null ? req.seniorityLevel() : "MID");
+        entity.setColor(req.color() != null ? req.color() : "#6366f1");
+        entity.setActive(true);
+        staff.save(entity);
+        return new StaffDto(entity.getId(), entity.getDisplayName(), entity.getRole(),
+                entity.getSeniorityLevel(), entity.getColor());
+    }
+
+    @Transactional
+    public void deactivateStaff(UUID id) {
+        UUID tenant = TenantContext.get();
+        Staff entity = staff.findByIdAndTenantId(id, tenant)
+                .orElseThrow(() -> new NotFoundException("Staff member not found"));
+        entity.setActive(false);
+    }
+
+    @Transactional
+    public ServiceDto updateServiceStaff(UUID serviceId, UpdateServiceStaffRequest req) {
+        UUID tenant = TenantContext.get();
+        ServiceEntity entity = services.findByIdAndTenantId(serviceId, tenant)
+                .orElseThrow(() -> new NotFoundException("Service not found"));
+        entity.setStaff(resolveStaff(tenant, req.staffIds()));
+        return toDto(entity);
     }
 
     private Set<Staff> resolveStaff(UUID tenant, List<UUID> staffIds) {

@@ -13,6 +13,7 @@ import {
   type Salon,
 } from "@/lib/api";
 import SalonAdmin from "@/components/SalonAdmin";
+import StaffAdmin from "@/components/StaffAdmin";
 import { getToken, getUser } from "@/lib/auth";
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
@@ -330,6 +331,7 @@ export default function DashboardPage() {
       )}
 
       {canManage && <SalonAdmin />}
+      {canManage && <StaffAdmin />}
     </div>
   );
 }
