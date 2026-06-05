@@ -6,7 +6,6 @@ import com.barbarizoo.common.NotFoundException;
 import com.barbarizoo.domain.Booking;
 import com.barbarizoo.domain.BookingStatus;
 import com.barbarizoo.domain.ServiceEntity;
-import com.barbarizoo.pricing.PricingService;
 import com.barbarizoo.repo.BookingRepository;
 import com.barbarizoo.repo.ServiceRepository;
 import com.barbarizoo.repo.StaffRepository;
@@ -35,14 +34,12 @@ public class AvailabilityService {
     private final ServiceRepository services;
     private final StaffRepository staff;
     private final BookingRepository bookings;
-    private final PricingService pricing;
 
     public AvailabilityService(ServiceRepository services, StaffRepository staff,
-                               BookingRepository bookings, PricingService pricing) {
+                               BookingRepository bookings) {
         this.services = services;
         this.staff = staff;
         this.bookings = bookings;
-        this.pricing = pricing;
     }
 
     public AvailabilityResponse availability(UUID serviceId, UUID staffId, LocalDate date) {
@@ -66,7 +63,8 @@ public class AvailabilityService {
         while (!cursor.isAfter(lastStart)) {
             LocalDateTime slotEnd = cursor.plusMinutes(duration);
             if (cursor.isAfter(now) && isFree(cursor, slotEnd, existing)) {
-                slots.add(new SlotDto(cursor, slotEnd, pricing.priceForSlot(service, cursor)));
+                // Fixed price set by the salon owner (no demand-based adjustment).
+                slots.add(new SlotDto(cursor, slotEnd, service.getBasePriceCents()));
             }
             cursor = cursor.plusMinutes(SLOT_STEP_MIN);
         }

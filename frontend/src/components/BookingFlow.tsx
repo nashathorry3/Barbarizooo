@@ -262,8 +262,8 @@ export default function BookingFlow({
         <p className="text-sm font-medium text-white/70">{salonName}</p>
         <h1 className="mt-1 text-3xl font-bold">Book your next look</h1>
         <p className="mt-1 max-w-lg text-white/80">
-          Pick a service, your stylist, and a time — prices update live with demand. Not sure what
-          suits you?{" "}
+          Pick a service, your stylist, and a time — clear, fixed prices set by the salon. Not sure
+          what suits you?{" "}
           <a href="/studio" className="font-semibold text-white underline">
             Try the AI Preview
           </a>

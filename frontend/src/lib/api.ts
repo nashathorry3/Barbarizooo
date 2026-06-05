@@ -218,6 +218,20 @@ export const api = {
       method: "POST",
       body: JSON.stringify(input),
     }),
+  updateService: (
+    id: string,
+    input: {
+      name?: string;
+      category?: string;
+      durationMin?: number;
+      basePriceCents?: number;
+      vatRate?: number;
+    }
+  ) =>
+    request<Service>(`/api/v1/services/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    }),
   deactivateService: (id: string) =>
     request<void>(`/api/v1/services/${id}`, { method: "DELETE" }),
   staff: () => request<Staff[]>("/api/v1/staff"),

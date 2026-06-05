@@ -4,6 +4,7 @@ import com.barbarizoo.api.dto.Dtos.CreateServiceRequest;
 import com.barbarizoo.api.dto.Dtos.CreateStaffRequest;
 import com.barbarizoo.api.dto.Dtos.ServiceDto;
 import com.barbarizoo.api.dto.Dtos.StaffDto;
+import com.barbarizoo.api.dto.Dtos.UpdateServiceRequest;
 import com.barbarizoo.api.dto.Dtos.UpdateServiceStaffRequest;
 import com.barbarizoo.service.CatalogService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,6 +50,13 @@ public class CatalogController {
     @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     public ServiceDto createService(@Valid @RequestBody CreateServiceRequest request) {
         return catalog.createService(request);
+    }
+
+    /** Edit a service (e.g. set its price) — owners and managers only. */
+    @PatchMapping("/services/{id}")
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
+    public ServiceDto updateService(@PathVariable UUID id, @Valid @RequestBody UpdateServiceRequest request) {
+        return catalog.updateService(id, request);
     }
 
     /** Deactivate a service — owners and managers only. */

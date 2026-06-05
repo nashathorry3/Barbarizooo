@@ -4,6 +4,7 @@ import com.barbarizoo.api.dto.Dtos.CreateServiceRequest;
 import com.barbarizoo.api.dto.Dtos.CreateStaffRequest;
 import com.barbarizoo.api.dto.Dtos.ServiceDto;
 import com.barbarizoo.api.dto.Dtos.StaffDto;
+import com.barbarizoo.api.dto.Dtos.UpdateServiceRequest;
 import com.barbarizoo.api.dto.Dtos.UpdateServiceStaffRequest;
 import com.barbarizoo.common.NotFoundException;
 import com.barbarizoo.domain.ServiceEntity;
@@ -62,6 +63,30 @@ public class CatalogService {
         entity.setActive(true);
         entity.setStaff(resolveStaff(tenant, req.staffIds()));
         services.save(entity);
+        return toDto(entity);
+    }
+
+    /** Edit a service's details (e.g. the owner-set price). Null fields are kept. */
+    @Transactional
+    public ServiceDto updateService(UUID id, UpdateServiceRequest req) {
+        UUID tenant = TenantContext.get();
+        ServiceEntity entity = services.findByIdAndTenantId(id, tenant)
+                .orElseThrow(() -> new NotFoundException("Service not found"));
+        if (req.name() != null && !req.name().isBlank()) {
+            entity.setName(req.name());
+        }
+        if (req.category() != null && !req.category().isBlank()) {
+            entity.setCategory(req.category());
+        }
+        if (req.durationMin() != null) {
+            entity.setDurationMin(req.durationMin());
+        }
+        if (req.basePriceCents() != null) {
+            entity.setBasePriceCents(req.basePriceCents());
+        }
+        if (req.vatRate() != null) {
+            entity.setVatRate(req.vatRate());
+        }
         return toDto(entity);
     }
 

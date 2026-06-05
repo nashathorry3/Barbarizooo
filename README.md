@@ -12,7 +12,7 @@ The goal: a product that is **stronger than Fresha, Treatwell, Shore, and Planit
 
 ```
 .
-├── backend/      Spring Boot (Java 21) REST API — booking core + dynamic pricing
+├── backend/      Spring Boot (Java 21) REST API — booking core + owner-set pricing
 ├── frontend/     Next.js (TypeScript, Tailwind) — customer booking + owner dashboard
 └── docs/         Full product blueprint (10 deliverables, see below)
 ```
@@ -76,8 +76,10 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
   (STYLIST/BARBER/COLORIST/RECEPTIONIST), seniority (JUNIOR/MID/SENIOR/MASTER), and color;
   deactivate staff; and configure which stylists are assignable to each service via
   `POST /api/v1/staff`, `DELETE /api/v1/staff/{id}`, and `PUT /api/v1/services/{id}/staff`.
+- **Owner-controlled pricing** — each service has a single fixed price set by the salon owner,
+  editable any time from the dashboard (`PATCH /api/v1/services/{id}`). No demand-based surcharges.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
-- Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
+- Availability at the salon's fixed per-service price (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement
 - Multi-tenancy: tenant derived from the JWT for authenticated requests, `X-Tenant-Id` for the
   public flow; Flyway migrations, BCrypt password hashing, GDPR consent capture, validation & error envelope

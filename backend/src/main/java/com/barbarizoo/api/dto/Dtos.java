@@ -46,7 +46,16 @@ public final class Dtos {
     public record UpdateServiceStaffRequest(List<UUID> staffIds) {
     }
 
-    /** A bookable slot with its dynamically-computed price. */
+    /** Edit an existing service. Null fields are left unchanged. */
+    public record UpdateServiceRequest(
+            String name,
+            String category,
+            @Positive Integer durationMin,
+            @Min(0) Integer basePriceCents,
+            Integer vatRate) {
+    }
+
+    /** A bookable slot at the salon's fixed price. */
     public record SlotDto(LocalDateTime start, LocalDateTime end, int priceCents) {
     }
 

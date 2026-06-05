@@ -11,7 +11,6 @@ import com.barbarizoo.domain.Customer;
 import com.barbarizoo.domain.ServiceEntity;
 import com.barbarizoo.domain.Staff;
 import com.barbarizoo.notifications.ReminderService;
-import com.barbarizoo.pricing.PricingService;
 import com.barbarizoo.repo.BookingRepository;
 import com.barbarizoo.repo.CustomerRepository;
 import com.barbarizoo.repo.ServiceRepository;
@@ -35,18 +34,16 @@ public class BookingService {
     private final ServiceRepository services;
     private final StaffRepository staff;
     private final CustomerRepository customers;
-    private final PricingService pricing;
     private final ReminderService reminders;
     private final AppProperties properties;
 
     public BookingService(BookingRepository bookings, ServiceRepository services, StaffRepository staff,
-                          CustomerRepository customers, PricingService pricing,
+                          CustomerRepository customers,
                           ReminderService reminders, AppProperties properties) {
         this.bookings = bookings;
         this.services = services;
         this.staff = staff;
         this.customers = customers;
-        this.pricing = pricing;
         this.reminders = reminders;
         this.properties = properties;
     }
@@ -101,7 +98,8 @@ public class BookingService {
         booking.setStartsAt(start);
         booking.setEndsAt(end);
         booking.setStatus(requireDeposit ? BookingStatus.PENDING : BookingStatus.CONFIRMED);
-        booking.setPriceCents(pricing.priceForSlot(service, start));
+        // Fixed price set by the salon owner.
+        booking.setPriceCents(service.getBasePriceCents());
         booking.setSource("WEB");
         bookings.save(booking);
 
