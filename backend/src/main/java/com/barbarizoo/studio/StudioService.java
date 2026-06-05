@@ -45,12 +45,12 @@ public class StudioService {
         return new SessionResponse("studio_" + UUID.randomUUID(), PRIVACY_NOTICE);
     }
 
-    /** Ranks styles by suitability for the given face shape and gender. */
-    public List<HairstyleDto> recommend(String faceShape, String gender) {
+    /** Ranks styles by suitability for the given face shape, gender, and age. */
+    public List<HairstyleDto> recommend(String faceShape, String gender, Integer age) {
         String shape = normalize(faceShape);
         String g = normalize(gender);
         return hairstyles.findAll().stream()
-                .map(h -> toDto(h, score(h, shape, g)))
+                .map(h -> toDto(h, score(h, shape, g, age)))
                 .sorted(Comparator.comparingInt(HairstyleDto::matchScore).reversed()
                         .thenComparing(HairstyleDto::trendScore, Comparator.reverseOrder()))
                 .toList();
@@ -66,8 +66,8 @@ public class StudioService {
                 style.getRecommendedCategory());
     }
 
-    /** match = trend baseline + face-shape fit + gender fit. */
-    private int score(Hairstyle h, String shape, String gender) {
+    /** match = trend baseline + face-shape fit + gender fit + age-group fit. */
+    private int score(Hairstyle h, String shape, String gender, Integer age) {
         int s = h.getTrendScore() / 10; // 0..10 baseline from popularity
         if (StringUtils.hasText(shape) && csvContains(h.getFaceShapes(), shape)) {
             s += 6;
@@ -79,7 +79,30 @@ public class StudioService {
                 s -= 3;
             }
         }
+        s += ageBonus(h, age);
         return s;
+    }
+
+    /**
+     * Adjusts score based on how well a style's trend level matches the customer's age group.
+     * Young customers lean toward high-trend styles; mature customers toward timeless classics.
+     */
+    private int ageBonus(Hairstyle h, Integer age) {
+        if (age == null) return 0;
+        int ts = h.getTrendScore();
+        if (age < 25) {
+            // Teens / young adults: reward cutting-edge trends
+            return ts >= 88 ? 4 : ts >= 75 ? 1 : -1;
+        } else if (age < 40) {
+            // Prime trend adopters: slight boost for anything popular
+            return ts >= 80 ? 2 : 0;
+        } else if (age < 55) {
+            // Mid-career: prefer wearable classics over hyper-trend
+            return ts < 80 ? 2 : 0;
+        } else {
+            // Mature: timeless styles score best, very trendy styles penalised
+            return ts < 75 ? 4 : ts >= 88 ? -2 : 1;
+        }
     }
 
     private boolean csvContains(String csv, String value) {

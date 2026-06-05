@@ -34,8 +34,9 @@ public class StudioController {
     @GetMapping("/recommendations")
     public List<HairstyleDto> recommendations(
             @RequestParam(required = false) String faceShape,
-            @RequestParam(required = false) String gender) {
-        return studio.recommend(faceShape, gender);
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) Integer age) {
+        return studio.recommend(faceShape, gender, age);
     }
 
     @PostMapping("/preview")

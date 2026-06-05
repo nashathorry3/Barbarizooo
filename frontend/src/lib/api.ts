@@ -271,10 +271,11 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ consent }),
     }),
-  recommendations: (faceShape?: string, gender?: string) => {
+  recommendations: (faceShape?: string, gender?: string, age?: number) => {
     const params = new URLSearchParams();
     if (faceShape) params.set("faceShape", faceShape);
     if (gender) params.set("gender", gender);
+    if (age !== undefined) params.set("age", String(age));
     return request<Hairstyle[]>(`/api/v1/studio/recommendations?${params}`);
   },
   studioPreview: (sessionId: string, styleId: string, faceShape?: string) =>
