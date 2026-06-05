@@ -34,6 +34,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 | GET  | `/api/v1/availability?serviceId&staffId&date` | public | Free slots + dynamic price |
 | POST | `/api/v1/services` | **OWNER/MANAGER** | Create a service |
 | DELETE | `/api/v1/services/{id}` | **OWNER/MANAGER** | Deactivate a service |
+| POST | `/api/v1/staff` | **OWNER/MANAGER** | Add a staff member |
+| DELETE | `/api/v1/staff/{id}` | **OWNER/MANAGER** | Deactivate a staff member |
+| PUT  | `/api/v1/services/{id}/staff` | **OWNER/MANAGER** | Replace service's assigned stylists |
 | GET  | `/api/v1/users` | **OWNER/MANAGER** | List staff accounts |
 | POST | `/api/v1/users` | **OWNER** | Create a staff account |
 | POST | `/api/v1/bookings` | public | Create a booking (customer flow) |

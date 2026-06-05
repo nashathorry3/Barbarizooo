@@ -72,6 +72,10 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
 - **Salon self-management (dashboard)** — owners customize their booking-link slug + salon name
   (`PATCH /api/v1/salons`, with normalization + uniqueness checks) and owners/managers add or
   remove services, all from the dashboard.
+- **Staff management (dashboard)** — owners/managers add stylists with display name, role
+  (STYLIST/BARBER/COLORIST/RECEPTIONIST), seniority (JUNIOR/MID/SENIOR/MASTER), and color;
+  deactivate staff; and configure which stylists are assignable to each service via
+  `POST /api/v1/staff`, `DELETE /api/v1/staff/{id}`, and `PUT /api/v1/services/{id}/staff`.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
 - Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement
