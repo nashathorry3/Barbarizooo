@@ -1,0 +1,9 @@
+# Automatic HTTPS via Let's Encrypt. Caddy obtains + renews certs on its own.
+
+{$DOMAIN} {
+	reverse_proxy web:3000
+}
+
+{$API_DOMAIN} {
+	reverse_proxy api:8080
+}

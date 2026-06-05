@@ -1,6 +1,62 @@
 # Deploying Barbarizoo
 
-Two paths. Both put data in the **EU (Frankfurt)** for GDPR.
+Pick a path. All keep data in the **EU** for GDPR.
+
+> **Hostinger note:** Hostinger *shared / cloud / web* hosting is PHP/MySQL only —
+> it **cannot** run Java (Spring Boot) or a Node server. The only Hostinger product
+> that runs this stack is a **KVM VPS**. See **Option C** below.
+
+---
+
+## Option C — Hostinger KVM VPS (one VPS, Docker Compose)
+
+Runs the whole stack — Postgres + API + frontend + automatic HTTPS — on a single
+VPS with one command. Recommended Hostinger plan: **KVM 2** or higher, OS template
+**Ubuntu 22.04** (or the "Ubuntu 24.04 with Docker" template to skip step 2).
+
+### 1. Point your domain at the VPS
+In your DNS, create two **A records** pointing at the VPS IP:
+```
+barbarizoo.de        →  <VPS_IP>
+api.barbarizoo.de    →  <VPS_IP>
+```
+
+### 2. Install Docker on the VPS (skip if using the Docker template)
+```bash
+ssh root@<VPS_IP>
+curl -fsSL https://get.docker.com | sh
+```
+
+### 3. Clone, configure, launch
+```bash
+git clone https://github.com/nashathorry3/Barbarizooo.git
+cd Barbarizooo
+cp .env.example .env
+nano .env          # set DOMAIN, API_DOMAIN, DB_PASSWORD, JWT_SECRET (+ Stripe/Google if used)
+docker compose up -d --build
+```
+
+That's it. Caddy automatically obtains Let's Encrypt certificates, so:
+- Frontend → `https://barbarizoo.de`
+- API → `https://api.barbarizoo.de`
+
+Flyway creates all tables + seed data on first boot. Postgres data persists in a
+Docker volume (`db-data`), so it survives restarts and redeploys.
+
+### Updating after a code change
+```bash
+git pull && docker compose up -d --build
+```
+
+### Useful commands
+```bash
+docker compose ps            # service status
+docker compose logs -f api   # tail backend logs
+docker compose down          # stop everything (data is kept)
+```
+
+> Generate a strong JWT secret with `openssl rand -base64 48`.
+> Open ports 80 + 443 in Hostinger's firewall (hPanel → VPS → Firewall).
 
 ---
 
