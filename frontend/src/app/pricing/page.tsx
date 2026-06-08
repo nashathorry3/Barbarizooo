@@ -60,7 +60,7 @@ export default function PricingPage() {
   return (
     <div className="rounded-3xl bg-slate-50 px-4 py-16 sm:px-8">
       <div className="mx-auto max-w-5xl">
-        <div className="text-center">
+        <div className="animate-fade-up text-center">
           <h1 className="text-4xl font-bold tracking-tight text-slate-900">
             Transparente Investition.
           </h1>
@@ -69,7 +69,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid items-start gap-6 lg:grid-cols-3">
+        <div className="stagger mt-12 grid items-start gap-6 lg:grid-cols-3">
           {PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} />
           ))}
@@ -86,8 +86,8 @@ export default function PricingPage() {
 function PlanCard({ plan }: { plan: Plan }) {
   if (plan.featured) {
     return (
-      <div className="relative rounded-3xl bg-[#0f3d2e] p-7 text-white shadow-xl lg:-mt-4 lg:pb-10">
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-4 py-1 text-xs font-bold uppercase tracking-wide text-[#0f3d2e]">
+      <div className="relative rounded-3xl bg-[#0f3d2e] p-7 text-white shadow-xl transition duration-300 hover:-translate-y-1.5 hover:shadow-2xl lg:-mt-4 lg:pb-10">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 animate-float whitespace-nowrap rounded-full bg-accent px-4 py-1 text-xs font-bold uppercase tracking-wide text-[#0f3d2e]">
           Am beliebtesten
         </span>
         <h2 className="text-xl font-bold">{plan.name}</h2>
@@ -105,7 +105,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         </ul>
         <Link
           href={plan.href}
-          className="mt-8 block rounded-full bg-white px-5 py-3 text-center text-sm font-semibold text-[#0f3d2e] transition hover:bg-slate-100"
+          className="mt-8 block rounded-full bg-white px-5 py-3 text-center text-sm font-semibold text-[#0f3d2e] transition duration-200 hover:bg-slate-100 active:scale-95"
         >
           {plan.cta}
         </Link>
@@ -114,7 +114,7 @@ function PlanCard({ plan }: { plan: Plan }) {
   }
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
+    <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-lift">
       <h2 className="text-xl font-bold text-slate-900">{plan.name}</h2>
       <p className="mt-1 text-sm text-slate-500">{plan.tagline}</p>
       <p className="mt-6">
@@ -130,7 +130,7 @@ function PlanCard({ plan }: { plan: Plan }) {
       </ul>
       <Link
         href={plan.href}
-        className="mt-8 block rounded-full border border-slate-300 px-5 py-3 text-center text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50"
+        className="mt-8 block rounded-full border border-slate-300 px-5 py-3 text-center text-sm font-semibold text-slate-800 transition duration-200 hover:border-slate-400 hover:bg-slate-50 active:scale-95"
       >
         {plan.cta}
       </Link>

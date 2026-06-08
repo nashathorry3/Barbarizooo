@@ -16,27 +16,59 @@ body {
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-200/70 bg-white shadow-card;
+    @apply rounded-2xl border border-slate-200/70 bg-white shadow-card
+           transition duration-300 ease-out;
+  }
+  /* Lift panels gently on hover for a tactile feel. */
+  .card-hover {
+    @apply hover:-translate-y-1 hover:shadow-lift;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-xl bg-brand px-4 py-2.5 font-medium text-white
-           shadow-sm transition hover:bg-brand-dark disabled:opacity-40;
+           shadow-sm transition duration-200 hover:bg-brand-dark hover:shadow-md
+           active:scale-95 disabled:opacity-40 disabled:active:scale-100;
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5
-           font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50;
+           font-medium text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50
+           active:scale-95;
   }
   .input {
     @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-900
            outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
   }
   .chip {
-    @apply rounded-full border px-3 py-1.5 text-sm transition;
+    @apply rounded-full border px-3 py-1.5 text-sm transition duration-200 active:scale-95;
   }
   .chip-on {
     @apply border-brand bg-brand text-white;
   }
   .chip-off {
-    @apply border-slate-200 bg-white hover:border-slate-300;
+    @apply border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300;
+  }
+}
+
+@layer utilities {
+  /* Reveal children one after another (entrance choreography). */
+  .stagger > * {
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.12s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.19s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.26s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.33s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.40s; }
+}
+
+/* Honor users who prefer reduced motion: keep the UI, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
