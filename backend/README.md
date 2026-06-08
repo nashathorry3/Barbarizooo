@@ -56,7 +56,10 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 **Booking ↔ deposit:** with `require-deposit=true` a booking is `PENDING` until the
 deposit is confirmed, then `CONFIRMED` (which schedules its reminders).
 **Reminders:** a `ReminderScheduler` dispatches due items every 30s via a
-`NotificationSender` (simulated; swap in WhatsApp/Email/SMS).
+`NotificationSender`. Default `simulated` logs them; set
+`NOTIFICATIONS_PROVIDER=email` + SMTP (`MAIL_HOST/PORT/USERNAME/PASSWORD`,
+`MAIL_FROM`) to send **real emails** (Brevo/Postmark/Gmail/…). WhatsApp/SMS are
+not wired yet and fall back to logging.
 **AI Hairstyle Preview:** the recommendation ranking is real; photo-realistic
 try-on is stubbed (`SIMULATED`) pending a GPU vision model.
 
