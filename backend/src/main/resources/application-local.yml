@@ -1,0 +1,12 @@
+# Activate with: --spring.profiles.active=local  (or SPRING_PROFILES_ACTIVE=local)
+#
+# Same zero-setup H2 engine as the default profile, but FILE-BASED so your data
+# (salons, staff, services, bookings, customers) survives restarts. Use this to
+# actually live in the product as a real salon owner without standing up Postgres.
+# The database lives in ./data/barbarizoo.mv.db — delete that file to start fresh.
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/barbarizoo;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
