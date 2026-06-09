@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AuthNav from "@/components/AuthNav";
+import Logo from "@/components/Logo";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Barbarizoo — Booking",
+  title: "Barbarizooo — Booking",
   description: "AI-native salon & barber platform for Germany",
 };
 
@@ -18,13 +19,8 @@ export default function RootLayout({
       <body>
         <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <Link href="/" className="group flex items-center gap-2 font-bold">
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-brand to-accent text-white shadow-sm transition duration-300 group-hover:rotate-6 group-hover:scale-110">
-                ✂️
-              </span>
-              <span className="bg-gradient-to-r from-brand to-accent-dark bg-clip-text text-lg text-transparent">
-                Barbarizoo
-              </span>
+            <Link href="/" className="group flex items-center font-bold">
+              <Logo />
             </Link>
             <AuthNav />
           </div>

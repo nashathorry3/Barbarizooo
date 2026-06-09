@@ -1,0 +1,25 @@
+<svg width="360" height="84" viewBox="0 0 360 84" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bz-lockup" x1="14" y1="12" x2="58" y2="74" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a4d37"/>
+      <stop offset="0.55" stop-color="#15795a"/>
+      <stop offset="1" stop-color="#33b083"/>
+    </linearGradient>
+  </defs>
+  <!-- Mark -->
+  <g transform="translate(10,10)">
+    <g fill="none" stroke="url(#bz-lockup)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 8 V56"/>
+      <path d="M20 9 H34 A12 11 0 0 1 34 31 H20"/>
+      <path d="M20 33 H37 A13 12 0 0 1 37 55 H20"/>
+    </g>
+    <path d="M13 53 L31 24" stroke="#c9efdd" stroke-width="6" stroke-linecap="round"/>
+    <path d="M13 53 L31 24" stroke="#4fc79a" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M13 53 L8 61" stroke="#0a4d37" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="13" cy="53" r="3.3" fill="#0a4d37"/>
+    <circle cx="13" cy="53" r="1.2" fill="#c9efdd"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="92" y="56" font-family="'Baloo 2','Quicksand','Trebuchet MS',system-ui,sans-serif"
+        font-size="46" font-weight="700" letter-spacing="-1" fill="#6b4329">barbarizooo</text>
+</svg>
