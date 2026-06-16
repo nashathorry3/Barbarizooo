@@ -12,7 +12,7 @@ The goal: a product that is **stronger than Fresha, Treatwell, Shore, and Planit
 
 ```
 .
-├── backend/      Spring Boot (Java 21) REST API — booking core + dynamic pricing
+├── backend/      Spring Boot (Java 21) REST API — booking core + owner-set pricing
 ├── frontend/     Next.js (TypeScript, Tailwind) — customer booking + owner dashboard
 └── docs/         Full product blueprint (10 deliverables, see below)
 ```
@@ -24,7 +24,9 @@ The goal: a product that is **stronger than Fresha, Treatwell, Shore, and Planit
 ```bash
 cd backend
 mvn spring-boot:run          # → http://localhost:8080
-# Postgres instead of H2:
+# Persistent local DB (your data survives restarts — no Postgres needed):
+# mvn spring-boot:run -Dspring-boot.run.profiles=local
+# Production-like Postgres instead of H2:
 # mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 ```
 
@@ -40,6 +42,22 @@ npm run dev                   # → http://localhost:3000
 Open `http://localhost:3000` to book an appointment and `http://localhost:3000/dashboard`
 to manage bookings. The seed salon ("Barbarizoo Demo Barbershop Berlin") comes with
 services and two stylists. Prices shift with demand via the rules-based Dynamic Pricing engine.
+
+### 🧑‍💼 Use it for real (as a salon owner)
+
+The whole flow is self-service — onboard your own salon and take live bookings:
+
+1. **Run the backend with a persistent DB** so your data survives restarts:
+   `mvn spring-boot:run -Dspring-boot.run.profiles=local` (file-based H2 in
+   `backend/data/`), or the full Postgres stack via `docker compose up -d --build`.
+2. **Sign up** at `http://localhost:3000/signup` → *Continue with Google* (demo
+   mode lets you enter any email — no Google account needed locally). This
+   **provisions your own salon** with you as OWNER plus a starter setup.
+3. **Set up your salon** in the dashboard: add your real services, prices, and
+   stylists. Your salon gets a public link at `http://localhost:3000/book/{your-slug}`.
+4. **Share that booking link** with customers — bookings, deposits, and reminders
+   flow into your dashboard. Flip on real Stripe/email/Google when you go live
+   (see `DEPLOY.md`).
 
 ### Implemented in this MVP slice
 - **Authentication & one-click salon sign-up** — JWT login (`POST /api/v1/auth/login`,
@@ -76,8 +94,10 @@ services and two stylists. Prices shift with demand via the rules-based Dynamic 
   (STYLIST/BARBER/COLORIST/RECEPTIONIST), seniority (JUNIOR/MID/SENIOR/MASTER), and color;
   deactivate staff; and configure which stylists are assignable to each service via
   `POST /api/v1/staff`, `DELETE /api/v1/staff/{id}`, and `PUT /api/v1/services/{id}/staff`.
+- **Owner-controlled pricing** — each service has a single fixed price set by the salon owner,
+  editable any time from the dashboard (`PATCH /api/v1/services/{id}`). No demand-based surcharges.
 - Service catalog & staff (`GET /api/v1/services`, `/staff`)
-- Availability with per-slot dynamic pricing (`GET /api/v1/availability`)
+- Availability at the salon's fixed per-service price (`GET /api/v1/availability`)
 - Booking create / list / status update (`/api/v1/bookings`) with no-double-booking enforcement
 - Multi-tenancy: tenant derived from the JWT for authenticated requests, `X-Tenant-Id` for the
   public flow; Flyway migrations, BCrypt password hashing, GDPR consent capture, validation & error envelope

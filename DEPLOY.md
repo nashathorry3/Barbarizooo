@@ -170,6 +170,22 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=<id>.apps.googleusercontent.com
 ```
 Without these, Google sign-in runs in **mock** mode for local testing.
 
+### Email reminders (real sending)
+Confirmation + 24h + 2h reminders are scheduled automatically. To actually
+**send them by email**, point the app at any SMTP provider (Brevo and Postmark
+have free tiers). Backend:
+```
+NOTIFICATIONS_PROVIDER=email
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=<smtp-user>
+MAIL_PASSWORD=<smtp-key>
+MAIL_FROM=no-reply@yourdomain.de
+MAIL_FROM_NAME=Your Salon
+```
+Without these, reminders run in **simulated** mode (logged, not sent). WhatsApp/SMS
+are not integrated yet and fall back to logging.
+
 ---
 
 ## Environment variable reference

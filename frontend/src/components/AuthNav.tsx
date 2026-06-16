@@ -35,6 +35,9 @@ export default function AuthNav() {
       <Link href="/studio" className="hover:text-brand">
         AI Preview
       </Link>
+      <Link href="/pricing" className="hover:text-brand">
+        Pricing
+      </Link>
       <Link href="/dashboard" className="hover:text-brand">
         Dashboard
       </Link>

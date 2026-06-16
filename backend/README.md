@@ -3,8 +3,8 @@
 Java 21 · Spring Boot 3.4 · Spring Data JPA · Flyway · H2 (dev) / PostgreSQL (prod).
 
 Implements the **booking-core vertical slice** of the Barbarizoo platform:
-service catalog, staff, availability with dynamic pricing, and bookings — all
-multi-tenant.
+service catalog, staff, availability at owner-set fixed prices, and bookings —
+all multi-tenant.
 
 ## Run
 
@@ -31,8 +31,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 | PATCH | `/api/v1/salons` | **OWNER** | Update this salon's name + booking-link slug |
 | GET  | `/api/v1/services` | public | List active services |
 | GET  | `/api/v1/staff` | public | List active staff |
-| GET  | `/api/v1/availability?serviceId&staffId&date` | public | Free slots + dynamic price |
+| GET  | `/api/v1/availability?serviceId&staffId&date` | public | Free slots at the salon's fixed price |
 | POST | `/api/v1/services` | **OWNER/MANAGER** | Create a service |
+| PATCH | `/api/v1/services/{id}` | **OWNER/MANAGER** | Edit a service (e.g. set its price) |
 | DELETE | `/api/v1/services/{id}` | **OWNER/MANAGER** | Deactivate a service |
 | POST | `/api/v1/staff` | **OWNER/MANAGER** | Add a staff member |
 | DELETE | `/api/v1/staff/{id}` | **OWNER/MANAGER** | Deactivate a staff member |
@@ -55,7 +56,10 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 **Booking ↔ deposit:** with `require-deposit=true` a booking is `PENDING` until the
 deposit is confirmed, then `CONFIRMED` (which schedules its reminders).
 **Reminders:** a `ReminderScheduler` dispatches due items every 30s via a
-`NotificationSender` (simulated; swap in WhatsApp/Email/SMS).
+`NotificationSender`. Default `simulated` logs them; set
+`NOTIFICATIONS_PROVIDER=email` + SMTP (`MAIL_HOST/PORT/USERNAME/PASSWORD`,
+`MAIL_FROM`) to send **real emails** (Brevo/Postmark/Gmail/…). WhatsApp/SMS are
+not wired yet and fall back to logging.
 **AI Hairstyle Preview:** the recommendation ranking is real; photo-realistic
 try-on is stubbed (`SIMULATED`) pending a GPU vision model.
 
@@ -110,7 +114,6 @@ security/      JWT issue/verify, auth filter, Spring Security config (RBAC)
 payments/      Provider-agnostic gateway + simulated impl, service, controller
 notifications/ Reminder scheduling + dispatch, NotificationSender (simulated)
 studio/        AI Hairstyle Preview: recommendation engine + (stubbed) preview
-pricing/       Dynamic Pricing engine (rules-based "lite")
 domain/        JPA entities (AppUser, Payment, Reminder, Hairstyle, ...)
 repo/          Spring Data repositories
 tenant/        Multi-tenant request context

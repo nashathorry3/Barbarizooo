@@ -21,6 +21,18 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  # SMTP for real email reminders (only used when notifications.provider=email).
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: ${PORT:8080}
@@ -41,6 +53,11 @@ barbarizoo:
     # "real" verifies genuine Google ID tokens against the client id below.
     mode: ${GOOGLE_AUTH_MODE:mock}
     client-id: ${GOOGLE_CLIENT_ID:}
+  notifications:
+    # "simulated" (default, logs) or "email" (real SMTP via spring.mail.* above).
+    provider: ${NOTIFICATIONS_PROVIDER:simulated}
+    from-email: ${MAIL_FROM:no-reply@barbarizoo.de}
+    from-name: ${MAIL_FROM_NAME:Barbarizoo}
   payments:
     # Deposit charged at booking to reduce no-shows (% of the slot price).
     deposit-percent: 30

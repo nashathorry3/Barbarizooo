@@ -188,8 +188,8 @@ export default function BookingFlow({
   if (booked) {
     return (
       <div className="mx-auto max-w-md space-y-4">
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-          <div className="text-4xl">✅</div>
+        <div className="animate-scale-in rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+          <div className="inline-block animate-pop text-4xl">✅</div>
           <h2 className="mt-2 text-xl font-semibold text-emerald-800">Booking confirmed</h2>
           <p className="mt-1 text-emerald-700">
             {booked.serviceName} with {booked.staffName} · {timeLabel(booked.startsAt)} ·{" "}
@@ -258,12 +258,12 @@ export default function BookingFlow({
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-7 text-white shadow-card">
+      <section className="animate-fade-up overflow-hidden rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-7 text-white shadow-card">
         <p className="text-sm font-medium text-white/70">{salonName}</p>
         <h1 className="mt-1 text-3xl font-bold">Book your next look</h1>
         <p className="mt-1 max-w-lg text-white/80">
-          Pick a service, your stylist, and a time — prices update live with demand. Not sure what
-          suits you?{" "}
+          Pick a service, your stylist, and a time — clear, fixed prices set by the salon. Not sure
+          what suits you?{" "}
           <a href="/studio" className="font-semibold text-white underline">
             Try the AI Preview
           </a>
@@ -277,18 +277,18 @@ export default function BookingFlow({
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <section className="card p-5">
+      <div className="stagger grid gap-6 md:grid-cols-2">
+        <section className="card card-hover p-5">
           <h2 className="mb-3 font-semibold">1 · Service</h2>
           <div className="space-y-2">
             {services.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setServiceId(s.id)}
-                className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition duration-200 ${
                   serviceId === s.id
-                    ? "border-brand bg-brand/5"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? "border-brand bg-brand/5 shadow-sm"
+                    : "border-slate-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm"
                 }`}
               >
                 <span>
@@ -306,7 +306,7 @@ export default function BookingFlow({
           </div>
         </section>
 
-        <section className="card p-5">
+        <section className="card card-hover p-5">
           <h2 className="mb-3 font-semibold">2 · Stylist &amp; date</h2>
           <label className="mb-1 block text-sm font-medium text-slate-600">Stylist</label>
           <div className="mb-4 flex flex-wrap gap-2">
@@ -335,7 +335,7 @@ export default function BookingFlow({
         </section>
       </div>
 
-      <section className="card p-5">
+      <section className="card card-hover p-5">
         <h2 className="mb-3 font-semibold">3 · Pick a time</h2>
         {!serviceId || !staffId ? (
           <p className="text-sm text-slate-400">
@@ -344,15 +344,15 @@ export default function BookingFlow({
         ) : loadingSlots ? (
           <p className="text-sm text-slate-400">Loading slots…</p>
         ) : availability && availability.slots.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="stagger flex flex-wrap gap-2">
             {availability.slots.map((s) => (
               <button
                 key={s.start}
                 onClick={() => setSlot(s)}
-                className={`rounded-xl border px-3 py-2 text-sm transition ${
+                className={`rounded-xl border px-3 py-2 text-sm transition duration-200 active:scale-95 ${
                   slot?.start === s.start
                     ? "border-brand bg-brand text-white"
-                    : "border-slate-200 hover:border-slate-300"
+                    : "border-slate-200 hover:-translate-y-0.5 hover:border-slate-300"
                 }`}
                 title={`${euro(s.priceCents)}`}
               >
@@ -373,7 +373,7 @@ export default function BookingFlow({
       </section>
 
       {slot && (
-        <section className="card p-5">
+        <section className="card card-hover animate-fade-up p-5">
           <h2 className="mb-3 font-semibold">4 · Your details</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <input

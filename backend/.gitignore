@@ -4,3 +4,5 @@ target/
 .idea/
 *.iml
 .DS_Store
+# Persistent local H2 database (application-local profile)
+data/

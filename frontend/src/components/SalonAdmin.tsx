@@ -25,6 +25,10 @@ export default function SalonAdmin() {
   const [svcDur, setSvcDur] = useState(30);
   const [svcPrice, setSvcPrice] = useState(25);
 
+  // Inline price editing per service.
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPrice, setEditPrice] = useState(0);
+
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   function reload() {
@@ -87,6 +91,22 @@ export default function SalonAdmin() {
     }
   }
 
+  function startEdit(id: string, currentCents: number) {
+    setEditingId(id);
+    setEditPrice(currentCents / 100);
+  }
+
+  async function savePrice(id: string) {
+    setError(null);
+    try {
+      await api.updateService(id, { basePriceCents: Math.round(editPrice * 100) });
+      setEditingId(null);
+      reload();
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
   return (
     <section className="space-y-4">
       <h2 className="text-lg font-semibold">Salon settings</h2>
@@ -139,20 +159,57 @@ export default function SalonAdmin() {
           {services.map((s) => (
             <div
               key={s.id}
-              className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-2.5"
+              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 px-4 py-2.5"
             >
               <div>
                 <span className="font-medium">{s.name}</span>
                 <span className="ml-2 text-xs text-slate-400">
-                  {s.durationMin} min · {s.category} · {euro(s.basePriceCents)}
+                  {s.durationMin} min · {s.category}
                 </span>
               </div>
-              <button
-                onClick={() => removeService(s.id)}
-                className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-600 hover:border-red-300 hover:text-red-600"
-              >
-                Remove
-              </button>
+
+              {editingId === s.id ? (
+                <div className="flex items-center gap-1">
+                  <span className="text-sm text-slate-400">€</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.5}
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(Number(e.target.value))}
+                    className="input w-24 py-1"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => savePrice(s.id)}
+                    className="rounded-lg bg-brand px-2.5 py-1 text-xs font-medium text-white hover:bg-brand-dark"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditingId(null)}
+                    className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-500 hover:border-slate-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-slate-700">{euro(s.basePriceCents)}</span>
+                  <button
+                    onClick={() => startEdit(s.id, s.basePriceCents)}
+                    className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-600 hover:border-brand hover:text-brand"
+                  >
+                    Edit price
+                  </button>
+                  <button
+                    onClick={() => removeService(s.id)}
+                    className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-600 hover:border-red-300 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
             </div>
           ))}
           {services.length === 0 && (

@@ -1,14 +1,34 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 
+const PLAN_LABELS: Record<string, string> = {
+  starter: "Starter",
+  professional: "Professional",
+  enterprise: "Enterprise",
+};
+
 export default function SignupPage() {
+  const [plan, setPlan] = useState<string | null>(null);
+
+  // Read the chosen plan from ?plan= (set by the pricing page).
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search).get("plan");
+    if (p && PLAN_LABELS[p]) setPlan(p);
+  }, []);
+
   return (
     <div className="mx-auto max-w-sm">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold">Register your salon</h1>
-        <p className="text-slate-500">
+        {plan && (
+          <p className="mt-2 inline-block rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
+            {PLAN_LABELS[plan]} plan selected
+          </p>
+        )}
+        <p className="mt-2 text-slate-500">
           One click with Google — no forms, no password. We set up your salon
           instantly so you can start taking bookings.
         </p>

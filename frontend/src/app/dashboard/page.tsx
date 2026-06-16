@@ -14,6 +14,8 @@ import {
 } from "@/lib/api";
 import SalonAdmin from "@/components/SalonAdmin";
 import StaffAdmin from "@/components/StaffAdmin";
+import Analytics from "@/components/Analytics";
+import BookingsCalendar from "@/components/BookingsCalendar";
 import { getToken, getUser } from "@/lib/auth";
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
@@ -39,6 +41,7 @@ export default function DashboardPage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<"table" | "calendar">("table");
   const user = getUser();
   const role = user?.role;
   const canManage = role === "OWNER" || role === "MANAGER";
@@ -155,6 +158,30 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {canManage && <Analytics bookings={bookings} />}
+
+      {/* Bookings — table or calendar view */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Bookings</h2>
+        <div className="flex rounded-lg border border-slate-200 p-0.5 text-sm">
+          <button
+            onClick={() => setView("table")}
+            className={`rounded-md px-3 py-1 ${view === "table" ? "bg-brand text-white" : "text-slate-500 hover:text-slate-700"}`}
+          >
+            Table
+          </button>
+          <button
+            onClick={() => setView("calendar")}
+            className={`rounded-md px-3 py-1 ${view === "calendar" ? "bg-brand text-white" : "text-slate-500 hover:text-slate-700"}`}
+          >
+            Calendar
+          </button>
+        </div>
+      </div>
+
+      {view === "calendar" ? (
+        <BookingsCalendar bookings={bookings} />
+      ) : (
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
@@ -217,6 +244,7 @@ export default function DashboardPage() {
           </tbody>
         </table>
       </div>
+      )}
 
       {canManage && (
         <section>
