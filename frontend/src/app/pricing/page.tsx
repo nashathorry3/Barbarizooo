@@ -19,7 +19,7 @@ const PLANS: Plan[] = [
     id: "starter",
     name: "Starter",
     tagline: "Für aufstrebende Salons mit bis zu 3 Mitarbeitern.",
-    price: "€79",
+    price: "€10",
     priceSuffix: "/ Monat",
     features: ["Basis Terminplanung", "Kundenkartei", "Standard Reporting"],
     cta: "Starter wählen",
@@ -29,7 +29,7 @@ const PLANS: Plan[] = [
     id: "professional",
     name: "Professional",
     tagline: "Das Kraftpaket für etablierte Premium-Salons.",
-    price: "€149",
+    price: "€20",
     priceSuffix: "/ Monat",
     features: [
       "Alles aus Starter",
